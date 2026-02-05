@@ -1,25 +1,18 @@
 import React from "react";
-import { View, Text, useWindowDimensions } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import Animated, {
-    useAnimatedStyle,
-    withSpring,
-    withTiming,
+    FadeIn,
+    FadeOut,
+    LinearTransition,
 } from "react-native-reanimated";
 import { colors } from "../constants/colors";
-
-const SPRING_CONFIG = {
-    damping: 18,
-    stiffness: 120,
-    mass: 1,
-};
-
-type FormStepState = "active" | "completed" | "future";
 
 interface FormStepProps {
     stepIndex: number;
     currentStep: number;
     title: string;
     completedSummary?: string;
+    onEdit?: () => void;
     children: React.ReactNode;
 }
 
@@ -28,79 +21,28 @@ export function FormStep({
     currentStep,
     title,
     completedSummary,
+    onEdit,
     children,
 }: FormStepProps) {
-    const { width } = useWindowDimensions();
+    const isActive = stepIndex === currentStep;
+    const isCompleted = stepIndex < currentStep;
+    const isFuture = stepIndex > currentStep;
 
-    const getState = (): FormStepState => {
-        if (stepIndex === currentStep) return "active";
-        if (stepIndex < currentStep) return "completed";
-        return "future";
-    };
-
-    const state = getState();
-
-    const containerAnimatedStyle = useAnimatedStyle(() => {
-        let translateY = 0;
-        let scale = 1;
-        let opacity = 1;
-
-        if (state === "active") {
-            translateY = 0;
-            scale = 1;
-            opacity = 1;
-        } else if (state === "completed") {
-            // Slight upward shift for stacking feel, but kept in-flow
-            translateY = -10;
-            scale = 0.98;
-            opacity = 1;
-        } else {
-            translateY = 30;
-            scale = 0.95;
-            opacity = 0;
-        }
-
-        return {
-            transform: [
-                { translateY: withSpring(translateY, SPRING_CONFIG) },
-                { scale: withSpring(scale, SPRING_CONFIG) },
-            ],
-            opacity: withTiming(opacity, { duration: 250 }),
-        };
-    }, [state]);
-
-    const contentAnimatedStyle = useAnimatedStyle(() => {
-        const isActive = state === "active";
-        return {
-            opacity: withTiming(isActive ? 1 : 0, { duration: 200 }),
-            height: withTiming(isActive ? "auto" : 0, { duration: 250 }),
-            marginTop: isActive ? 8 : 0,
-        };
-    }, [state]);
-
-    const summaryAnimatedStyle = useAnimatedStyle(() => {
-        const isCompleted = state === "completed";
-        return {
-            opacity: withTiming(isCompleted ? 1 : 0, { duration: 200 }),
-            height: withTiming(isCompleted ? "auto" : 0, { duration: 250 }),
-            marginBottom: isCompleted ? 16 : 0,
-        };
-    }, [state]);
+    // Don't render future steps at all
+    if (isFuture) return null;
 
     return (
         <Animated.View
-            style={[
-                {
-                    width: "100%",
-                    alignSelf: "center",
-                },
-                containerAnimatedStyle,
-            ]}
+            layout={LinearTransition.springify().damping(18).stiffness(120)}
+            entering={FadeIn.duration(300)}
+            exiting={FadeOut.duration(200)}
+            style={{ width: "100%" }}
         >
-            {/* Completed Summary Pill */}
-            <Animated.View
-                style={[
-                    {
+            {/* Completed: Show summary pill */}
+            {isCompleted && (
+                <Pressable
+                    onPress={onEdit}
+                    style={({ pressed }) => ({
                         backgroundColor: colors.white,
                         borderRadius: 14,
                         borderWidth: 1,
@@ -109,48 +51,52 @@ export function FormStep({
                         paddingVertical: 14,
                         flexDirection: "row",
                         alignItems: "center",
-                        boxShadow: "0 2px 8px rgba(27, 27, 27, 0.04)",
-                        overflow: "hidden",
+                        marginBottom: 12,
+                        boxShadow: "0 1px 4px rgba(27, 27, 27, 0.04)",
                         borderCurve: "continuous",
-                    },
-                    summaryAnimatedStyle,
-                ]}
-            >
-                <View
-                    style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: 3,
-                        backgroundColor: colors.regalNavy,
-                        marginRight: 10,
-                    }}
-                />
-                <Text
-                    style={{
-                        fontSize: 14,
-                        fontWeight: "600",
-                        color: colors.carbonBlack,
-                        flex: 1,
-                    }}
-                    numberOfLines={1}
+                        opacity: pressed ? 0.8 : 1,
+                    })}
                 >
-                    {completedSummary || title}
-                </Text>
-                <Text
-                    style={{
-                        fontSize: 11,
-                        fontWeight: "700",
-                        color: colors.paleOak,
-                        textTransform: "uppercase",
-                    }}
-                >
-                    Edit
-                </Text>
-            </Animated.View>
+                    <View
+                        style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: 3,
+                            backgroundColor: colors.regalNavy,
+                            marginRight: 10,
+                        }}
+                    />
+                    <Text
+                        style={{
+                            fontSize: 14,
+                            fontWeight: "600",
+                            color: colors.carbonBlack,
+                            flex: 1,
+                        }}
+                        numberOfLines={1}
+                    >
+                        {completedSummary || title}
+                    </Text>
+                    {onEdit && (
+                        <Text
+                            style={{
+                                fontSize: 11,
+                                fontWeight: "700",
+                                color: colors.ashBrown,
+                                textTransform: "uppercase",
+                            }}
+                        >
+                            Edit
+                        </Text>
+                    )}
+                </Pressable>
+            )}
 
-            {/* Active Content */}
-            <Animated.View style={[{ overflow: "hidden" }, contentAnimatedStyle]}>
-                <View style={{ marginBottom: 12 }}>
+            {/* Active: Show full content */}
+            {isActive && (
+                <Animated.View
+                    entering={FadeIn.duration(300).delay(100)}
+                >
                     <Text
                         style={{
                             fontSize: 12,
@@ -158,13 +104,14 @@ export function FormStep({
                             color: colors.burntPeach,
                             letterSpacing: 1,
                             textTransform: "uppercase",
+                            marginBottom: 14,
                         }}
                     >
                         {title}
                     </Text>
-                </View>
-                {children}
-            </Animated.View>
+                    {children}
+                </Animated.View>
+            )}
         </Animated.View>
     );
 }

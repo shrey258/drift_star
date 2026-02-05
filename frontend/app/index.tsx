@@ -46,59 +46,52 @@ export default function HomeScreen() {
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          paddingTop: insets.top + 48,
-          paddingBottom: insets.bottom + 32,
+          paddingTop: insets.top + 32,
+          paddingBottom: insets.bottom + 24,
           paddingHorizontal: 24,
         }}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         {/* Hero Section */}
-        <Animated.View entering={FadeInDown.duration(500).delay(100)}>
-          <Animated.View
-            style={[
-              { marginBottom: 32 },
-              useAnimatedStyle(() => ({
-                opacity: withTiming(state.currentStep === 0 ? 1 : 0.4, { duration: 400 }),
-                transform: [{ translateY: withTiming(state.currentStep === 0 ? 0 : -20, { duration: 400 }) }],
-                // Dynamically shrink margin to give more space to the form
-                marginBottom: withTiming(state.currentStep === 0 ? 32 : 12, { duration: 400 }),
-              }))
-            ]}
+        <Animated.View
+          entering={FadeInDown.duration(400).delay(50)}
+          style={{ marginBottom: 28 }}
+        >
+          <Text
+            style={{
+              fontSize: 12,
+              fontWeight: "700",
+              color: colors.burntPeach,
+              letterSpacing: 1.5,
+              textTransform: "uppercase",
+              marginBottom: 8,
+            }}
           >
-            <Text
-              style={{
-                fontSize: 13,
-                fontWeight: "700",
-                color: colors.burntPeach,
-                letterSpacing: 1.5,
-                textTransform: "uppercase",
-                marginBottom: 12,
-              }}
-            >
-              Drift Star
-            </Text>
-            <Text
-              style={{
-                fontSize: 34,
-                fontWeight: "700",
-                color: colors.carbonBlack,
-                lineHeight: 42,
-                letterSpacing: -0.5,
-              }}
-            >
-              Plan your adventure
-            </Text>
-          </Animated.View>
+            Drift Star
+          </Text>
+          <Text
+            style={{
+              fontSize: 32,
+              fontWeight: "700",
+              color: colors.carbonBlack,
+              lineHeight: 40,
+              letterSpacing: -0.5,
+            }}
+          >
+            Plan your adventure
+          </Text>
         </Animated.View>
 
-        {/* Multi-Step Form */}
-        <View style={{ flex: 1, gap: 12 }}>
+        {/* Form Steps */}
+        <View style={{ flex: 1 }}>
           {/* Step 0: Destination */}
           <FormStep
             stepIndex={0}
             currentStep={state.currentStep}
             title="Where to?"
             completedSummary={state.destination}
+            onEdit={() => actions.goToPreviousStep()}
           >
             <Animated.View
               style={[
@@ -108,7 +101,6 @@ export default function HomeScreen() {
                   borderWidth: 1.5,
                   borderCurve: "continuous",
                   boxShadow: "0 2px 8px rgba(27, 27, 27, 0.06)",
-                  position: "relative",
                 },
                 inputAnimatedStyle,
               ]}
@@ -146,7 +138,7 @@ export default function HomeScreen() {
             {/* Autocomplete List */}
             {state.countries.length > 0 && state.isFocused && (
               <Animated.View
-                entering={FadeInDown.duration(200)}
+                entering={FadeIn.duration(150)}
                 style={{
                   marginTop: 8,
                   backgroundColor: colors.white,
@@ -262,6 +254,7 @@ export default function HomeScreen() {
             currentStep={state.currentStep}
             title="When?"
             completedSummary={actions.getStepSummary(1)}
+            onEdit={() => actions.goToPreviousStep()}
           >
             <View
               style={{
@@ -269,7 +262,7 @@ export default function HomeScreen() {
                 borderRadius: 14,
                 borderWidth: 1,
                 borderColor: colors.borderLight,
-                padding: 16,
+                padding: 12,
                 alignItems: "center",
               }}
             >
@@ -301,25 +294,16 @@ export default function HomeScreen() {
                 borderRadius: 14,
                 borderWidth: 1,
                 borderColor: colors.borderLight,
-                padding: 24,
+                paddingVertical: 32,
+                paddingHorizontal: 24,
               }}
             >
-              <Text
-                style={{
-                  fontSize: 15,
-                  color: colors.ashBrown,
-                  textAlign: "center",
-                  marginBottom: 16,
-                }}
-              >
-                Select number of days
-              </Text>
               <View
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: 24,
+                  gap: 32,
                 }}
               >
                 <Pressable
@@ -327,13 +311,13 @@ export default function HomeScreen() {
                     actions.setNumberOfDays(Math.max(1, state.numberOfDays - 1))
                   }
                   style={({ pressed }) => ({
-                    width: 48,
-                    height: 48,
-                    borderRadius: 24,
+                    width: 56,
+                    height: 56,
+                    borderRadius: 28,
                     backgroundColor: pressed
                       ? colors.primaryLight
                       : colors.white,
-                    borderWidth: 1,
+                    borderWidth: 1.5,
                     borderColor: colors.borderLight,
                     justifyContent: "center",
                     alignItems: "center",
@@ -341,19 +325,20 @@ export default function HomeScreen() {
                 >
                   <Text
                     style={{
-                      fontSize: 24,
-                      fontWeight: "600",
+                      fontSize: 28,
+                      fontWeight: "500",
                       color: colors.carbonBlack,
+                      marginTop: -2,
                     }}
                   >
                     −
                   </Text>
                 </Pressable>
 
-                <View style={{ alignItems: "center", minWidth: 80 }}>
+                <View style={{ alignItems: "center", minWidth: 90 }}>
                   <Text
                     style={{
-                      fontSize: 48,
+                      fontSize: 56,
                       fontWeight: "700",
                       color: colors.regalNavy,
                       fontVariant: ["tabular-nums"],
@@ -363,9 +348,10 @@ export default function HomeScreen() {
                   </Text>
                   <Text
                     style={{
-                      fontSize: 14,
+                      fontSize: 15,
+                      fontWeight: "500",
                       color: colors.ashBrown,
-                      marginTop: -4,
+                      marginTop: -6,
                     }}
                   >
                     {state.numberOfDays === 1 ? "day" : "days"}
@@ -379,13 +365,13 @@ export default function HomeScreen() {
                     )
                   }
                   style={({ pressed }) => ({
-                    width: 48,
-                    height: 48,
-                    borderRadius: 24,
+                    width: 56,
+                    height: 56,
+                    borderRadius: 28,
                     backgroundColor: pressed
                       ? colors.primaryLight
                       : colors.white,
-                    borderWidth: 1,
+                    borderWidth: 1.5,
                     borderColor: colors.borderLight,
                     justifyContent: "center",
                     alignItems: "center",
@@ -393,9 +379,10 @@ export default function HomeScreen() {
                 >
                   <Text
                     style={{
-                      fontSize: 24,
-                      fontWeight: "600",
+                      fontSize: 28,
+                      fontWeight: "500",
                       color: colors.carbonBlack,
+                      marginTop: -2,
                     }}
                   >
                     +
@@ -406,23 +393,22 @@ export default function HomeScreen() {
           </FormStep>
         </View>
 
-        <View style={{ marginTop: "auto", paddingTop: 24 }}>
-          {/* Back Button */}
+        {/* Navigation */}
+        <View style={{ paddingTop: 24 }}>
           {state.currentStep > 0 && (
-            <Animated.View entering={FadeIn.duration(200)}>
+            <Animated.View entering={FadeIn.duration(150)}>
               <Pressable
                 onPress={actions.goToPreviousStep}
                 style={({ pressed }) => ({
-                  paddingVertical: 12,
+                  paddingVertical: 14,
                   alignItems: "center",
-                  marginBottom: 12,
                   opacity: pressed ? 0.6 : 1,
                 })}
               >
                 <Text
                   style={{
                     fontSize: 15,
-                    fontWeight: "500",
+                    fontWeight: "600",
                     color: colors.ashBrown,
                   }}
                 >
@@ -432,40 +418,39 @@ export default function HomeScreen() {
             </Animated.View>
           )}
 
-          {/* Primary CTA */}
-          <Animated.View entering={FadeInDown.duration(500).delay(450)}>
-            <AnimatedPressable
-              onPress={
-                state.isLastStep ? actions.handleSubmit : actions.goToNextStep
-              }
-              disabled={!state.isCurrentStepValid}
-              style={[
-                {
-                  backgroundColor: colors.regalNavy,
-                  borderRadius: 14,
-                  borderCurve: "continuous",
-                  paddingVertical: 16,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: state.isCurrentStepValid
-                    ? "0 4px 16px rgba(16, 57, 132, 0.35)"
-                    : "none",
-                },
-                buttonAnimatedStyle,
-              ]}
+          <AnimatedPressable
+            onPress={
+              state.isLastStep ? actions.handleSubmit : actions.goToNextStep
+            }
+            disabled={!state.isCurrentStepValid}
+            style={[
+              {
+                backgroundColor: state.isCurrentStepValid
+                  ? colors.regalNavy
+                  : colors.paleOak,
+                borderRadius: 14,
+                borderCurve: "continuous",
+                paddingVertical: 18,
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: state.isCurrentStepValid
+                  ? "0 4px 16px rgba(16, 57, 132, 0.3)"
+                  : "none",
+              },
+              buttonAnimatedStyle,
+            ]}
+          >
+            <Text
+              style={{
+                fontSize: 17,
+                fontWeight: "600",
+                color: colors.white,
+                letterSpacing: 0.3,
+              }}
             >
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: colors.white,
-                  letterSpacing: 0.3,
-                }}
-              >
-                {buttonText}
-              </Text>
-            </AnimatedPressable>
-          </Animated.View>
+              {buttonText}
+            </Text>
+          </AnimatedPressable>
         </View>
       </ScrollView>
     </View>
