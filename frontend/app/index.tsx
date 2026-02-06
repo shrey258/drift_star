@@ -418,28 +418,58 @@ export default function HomeScreen() {
             </Animated.View>
           )}
 
+          {/* Error Message */}
+          {state.error && (
+            <Animated.View
+              entering={FadeIn.duration(200)}
+              style={{
+                backgroundColor: "#FEE2E2",
+                borderRadius: 10,
+                padding: 12,
+                marginBottom: 12,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: "#B91C1C",
+                  textAlign: "center",
+                }}
+              >
+                {state.error}
+              </Text>
+            </Animated.View>
+          )}
+
           <AnimatedPressable
             onPress={
               state.isLastStep ? actions.handleSubmit : actions.goToNextStep
             }
-            disabled={!state.isCurrentStepValid}
+            disabled={!state.isCurrentStepValid || state.isGenerating}
             style={[
               {
-                backgroundColor: state.isCurrentStepValid
-                  ? colors.regalNavy
-                  : colors.paleOak,
+                backgroundColor:
+                  state.isCurrentStepValid && !state.isGenerating
+                    ? colors.regalNavy
+                    : colors.paleOak,
                 borderRadius: 14,
                 borderCurve: "continuous",
                 paddingVertical: 18,
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: state.isCurrentStepValid
-                  ? "0 4px 16px rgba(16, 57, 132, 0.3)"
-                  : "none",
+                flexDirection: "row",
+                gap: 10,
+                boxShadow:
+                  state.isCurrentStepValid && !state.isGenerating
+                    ? "0 4px 16px rgba(16, 57, 132, 0.3)"
+                    : "none",
               },
               buttonAnimatedStyle,
             ]}
           >
+            {state.isGenerating && (
+              <ActivityIndicator size="small" color={colors.white} />
+            )}
             <Text
               style={{
                 fontSize: 17,
@@ -448,7 +478,11 @@ export default function HomeScreen() {
                 letterSpacing: 0.3,
               }}
             >
-              {buttonText}
+              {state.isGenerating
+                ? "Generating..."
+                : state.isLastStep
+                  ? "Generate Itinerary"
+                  : "Continue"}
             </Text>
           </AnimatedPressable>
         </View>

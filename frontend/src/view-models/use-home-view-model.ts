@@ -2,7 +2,9 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { TextInput, Keyboard } from "react-native";
 import { useSharedValue, withSpring } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import { CountryService, CountrySuggestion } from "../services/country-service";
+import { apiService } from "../services/api-service";
 
 export type FormStep = 0 | 1 | 2;
 
@@ -14,6 +16,8 @@ export interface TripFormState {
 }
 
 export const useHomeViewModel = () => {
+    const router = useRouter();
+
     // Form state
     const [currentStep, setCurrentStep] = useState<FormStep>(0);
     const [destination, setDestination] = useState("");
@@ -25,6 +29,8 @@ export const useHomeViewModel = () => {
     const [isFocused, setIsFocused] = useState(false);
     const [countries, setCountries] = useState<CountrySuggestion[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const inputRef = useRef<TextInput>(null);
     const buttonScale = useSharedValue(1);
@@ -92,7 +98,7 @@ export const useHomeViewModel = () => {
         }
     }, [currentStep]);
 
-    const handleSubmit = useCallback(() => {
+    const handleSubmit = useCallback(async () => {
         buttonScale.value = withSpring(0.96, { damping: 15 }, () => {
             buttonScale.value = withSpring(1, { damping: 15 });
         });
@@ -101,13 +107,27 @@ export const useHomeViewModel = () => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
 
-        console.log("Submitting trip:", {
-            destination,
-            travelDate: travelDate.toISOString(),
-            numberOfDays,
-        });
-        // TODO: Navigate to generation screen or call API
-    }, [destination, travelDate, numberOfDays]);
+        setIsGenerating(true);
+        setError(null);
+
+        try {
+            const itinerary = await apiService.generateItinerary(
+                destination,
+                numberOfDays,
+                travelDate
+            );
+
+            // Navigate to trip screen with the generated trip ID
+            router.push(`/trip/${itinerary.id}`);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to generate itinerary");
+            if (process.env.EXPO_OS === "ios") {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            }
+        } finally {
+            setIsGenerating(false);
+        }
+    }, [destination, travelDate, numberOfDays, router]);
 
     // Validation
     const isCurrentStepValid = useMemo(() => {
@@ -156,6 +176,8 @@ export const useHomeViewModel = () => {
             isFocused,
             countries,
             isLoading,
+            isGenerating,
+            error,
             isCurrentStepValid,
             isLastStep,
         },
