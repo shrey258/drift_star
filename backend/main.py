@@ -183,11 +183,12 @@ async def generate_itinerary(
     with activities grouped by proximity.
     """
     try:
-        logger.info(f"Generating itinerary for {request.destination} ({request.days} days)")
+        logger.info(f"Generating itinerary for {request.destination} ({request.days} days) starting {request.start_date}")
 
         itinerary = await generator.generate_itinerary(
             destination=request.destination,
             days=request.days,
+            start_date=request.start_date,
         )
 
         # Save to storage

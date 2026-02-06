@@ -6,6 +6,7 @@ Strict schemas for itinerary data, request/response validation.
 
 from pydantic import BaseModel, Field
 from typing import Optional
+from datetime import date
 import uuid
 
 
@@ -44,6 +45,8 @@ class Itinerary(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     trip_title: str = Field(..., description="Title of the trip")
     destination: str = Field(..., description="Destination city/region")
+    start_date: Optional[date] = Field(default=None, description="Trip start date")
+    end_date: Optional[date] = Field(default=None, description="Trip end date")
     days: list[Day] = Field(default_factory=list)
 
 
@@ -56,6 +59,7 @@ class GenerateRequest(BaseModel):
 
     destination: str = Field(..., min_length=2, max_length=100)
     days: int = Field(..., ge=1, le=14, description="Number of days (1-14)")
+    start_date: date = Field(..., description="Trip start date")
 
 
 class EnrichImagesRequest(BaseModel):

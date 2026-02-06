@@ -13,6 +13,7 @@ from typing import Optional
 from google import genai
 from google.genai import types
 import httpx
+from datetime import date, timedelta
 
 from models import Activity, Day, Itinerary
 
@@ -32,14 +33,20 @@ class ItineraryGeneratorService:
         self.client = genai.Client(api_key=api_key)
         self.model_id = "gemini-2.0-flash"
 
-    async def generate_itinerary(self, destination: str, days: int) -> Itinerary:
+    async def generate_itinerary(self, destination: str, days: int, start_date: date) -> Itinerary:
         """
         Generate a structured travel itinerary.
         """
-        logger.info(f"Calling Gemini ({self.model_id}) for {destination}...")
+        end_date = start_date + timedelta(days=days - 1)
+        logger.info(f"Calling Gemini ({self.model_id}) for {destination} from {start_date} to {end_date}...")
         
         system_prompt = f"""You are an expert local guide. Create a logical, walkable itinerary 
-for {days} days in {destination}. 
+for {days} days in {destination}, starting on {start_date.strftime('%B %d, %Y')} ({start_date.strftime('%A')}).
+
+Date Context:
+- Trip dates: {start_date.strftime('%B %d')} to {end_date.strftime('%B %d, %Y')}
+- Season: Consider weather, local events, festivals, and seasonal attractions
+- Day of week: Plan activities appropriate for weekdays vs weekends
 
 Requirements:
 - Group activities by proximity to minimize travel time
@@ -49,9 +56,10 @@ Requirements:
 - Include a mix of major attractions, local gems, and dining experiences
 - image_keyword should be specific and searchable (e.g., "Eiffel Tower Paris sunset")
 - duration_minutes should be realistic (typically 30-180 minutes)
+- Suggest any seasonal events or festivals happening during these dates
 """
 
-        user_prompt = f"Create a {days}-day travel itinerary for {destination}."
+        user_prompt = f"Create a {days}-day travel itinerary for {destination} starting {start_date.strftime('%B %d, %Y')}."
 
         try:
             response = await self.client.aio.models.generate_content(
@@ -74,6 +82,8 @@ Requirements:
             if not itinerary.trip_title:
                 itinerary.trip_title = f"{days}-Day {destination} Adventure"
             itinerary.destination = destination
+            itinerary.start_date = start_date
+            itinerary.end_date = end_date
 
             return itinerary
 
