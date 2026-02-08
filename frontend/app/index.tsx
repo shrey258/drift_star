@@ -23,6 +23,7 @@ import { SUGGESTIONS } from "../src/constants/suggestions";
 import { FormStep } from "../src/components/form-step";
 import { DestinationStep } from "../src/components/destination-step";
 import { DateStep } from "../src/components/date-step";
+import { GeneratingOverlay } from "../src/components/generating-overlay";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -46,6 +47,12 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {/* Generating Overlay */}
+      <GeneratingOverlay
+        visible={state.isGenerating}
+        destination={state.destination}
+      />
+
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
