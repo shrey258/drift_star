@@ -23,6 +23,7 @@ import { SUGGESTIONS } from "../src/constants/suggestions";
 import { FormStep } from "../src/components/form-step";
 import { DestinationStep } from "../src/components/destination-step";
 import { DateStep } from "../src/components/date-step";
+import { DaysStep } from "../src/components/days-step";
 import { GeneratingOverlay } from "../src/components/generating-overlay";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -124,115 +125,14 @@ export default function HomeScreen() {
           />
 
           {/* Step 2: Number of Days */}
-          <FormStep
-            stepIndex={2}
-            currentStep={state.currentStep}
-            title="How long?"
-            completedSummary={actions.getStepSummary(2)}
-          >
-            <View
-              style={{
-                backgroundColor: colors.white,
-                borderRadius: 14,
-                borderWidth: 1,
-                borderColor: colors.borderLight,
-                paddingVertical: 32,
-                paddingHorizontal: 24,
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 32,
-                }}
-              >
-                <Pressable
-                  onPress={() =>
-                    actions.setNumberOfDays(Math.max(1, state.numberOfDays - 1))
-                  }
-                  style={({ pressed }) => ({
-                    width: 56,
-                    height: 56,
-                    borderRadius: 28,
-                    backgroundColor: pressed
-                      ? colors.primaryLight
-                      : colors.white,
-                    borderWidth: 1.5,
-                    borderColor: colors.borderLight,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  })}
-                >
-                  <Text
-                    style={{
-                      fontSize: 28,
-                      fontWeight: "500",
-                      color: colors.carbonBlack,
-                      marginTop: -2,
-                    }}
-                  >
-                    −
-                  </Text>
-                </Pressable>
-
-                <View style={{ alignItems: "center", minWidth: 90 }}>
-                  <Text
-                    style={{
-                      fontSize: 56,
-                      fontWeight: "700",
-                      color: colors.regalNavy,
-                      fontVariant: ["tabular-nums"],
-                    }}
-                  >
-                    {state.numberOfDays}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      fontWeight: "500",
-                      color: colors.ashBrown,
-                      marginTop: -6,
-                    }}
-                  >
-                    {state.numberOfDays === 1 ? "day" : "days"}
-                  </Text>
-                </View>
-
-                <Pressable
-                  onPress={() =>
-                    actions.setNumberOfDays(
-                      Math.min(14, state.numberOfDays + 1)
-                    )
-                  }
-                  style={({ pressed }) => ({
-                    width: 56,
-                    height: 56,
-                    borderRadius: 28,
-                    backgroundColor: pressed
-                      ? colors.primaryLight
-                      : colors.white,
-                    borderWidth: 1.5,
-                    borderColor: colors.borderLight,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  })}
-                >
-                  <Text
-                    style={{
-                      fontSize: 28,
-                      fontWeight: "500",
-                      color: colors.carbonBlack,
-                      marginTop: -2,
-                    }}
-                  >
-                    +
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-          </FormStep>
+          <DaysStep
+            isActive={state.currentStep === 2}
+            isCompleted={state.currentStep > 2 || state.isPreGenerating}
+            days={state.numberOfDays}
+            onChange={actions.setNumberOfDays}
+            onNext={actions.handleSubmit} // Use handleSubmit directly here since it's the last step
+            onEdit={() => actions.setCurrentStep(2)}
+          />
         </View>
 
         {/* Navigation */}
@@ -287,7 +187,7 @@ export default function HomeScreen() {
             onPress={
               state.isLastStep ? actions.handleSubmit : actions.goToNextStep
             }
-            disabled={!state.isCurrentStepValid || state.isGenerating}
+            disabled={!state.isCurrentStepValid || state.isGenerating || state.isPreGenerating}
             style={[
               {
                 backgroundColor:
