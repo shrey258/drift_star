@@ -55,8 +55,11 @@ export function DestinationStep({
     const completionProgress = useSharedValue(isCompleted ? 1 : 0);
 
     useEffect(() => {
-        completionProgress.value = withTiming(isCompleted ? 1 : 0, {
-            duration: 300,
+        completionProgress.value = withSpring(isCompleted ? 1 : 0, {
+            mass: 1,
+            damping: 30, // Higher damping = less bounce, smoother stop
+            stiffness: 250, // Higher stiffness = tighter handling
+            overshootClamping: false, // Allow slight overshoot for organic feel
         });
     }, [isCompleted]);
 

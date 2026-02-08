@@ -22,6 +22,7 @@ import { useHomeViewModel } from "../src/view-models/use-home-view-model";
 import { SUGGESTIONS } from "../src/constants/suggestions";
 import { FormStep } from "../src/components/form-step";
 import { DestinationStep } from "../src/components/destination-step";
+import { DateStep } from "../src/components/date-step";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -106,38 +107,14 @@ export default function HomeScreen() {
           />
 
           {/* Step 1: Date */}
-          <FormStep
-            stepIndex={1}
-            currentStep={state.currentStep}
-            title="When?"
-            completedSummary={actions.getStepSummary(1)}
-            onEdit={() => actions.goToPreviousStep()}
-          >
-            <View
-              style={{
-                backgroundColor: colors.white,
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: colors.borderLight,
-                overflow: "hidden",
-              }}
-            >
-              <DateTimePicker
-                value={state.travelDate}
-                mode="date"
-                display="inline"
-                minimumDate={new Date()}
-                themeVariant="light"
-                accentColor={colors.regalNavy}
-                onChange={(event, selectedDate) => {
-                  if (selectedDate) {
-                    actions.setTravelDate(selectedDate);
-                  }
-                }}
-                style={{ alignSelf: "center" }}
-              />
-            </View>
-          </FormStep>
+          <DateStep
+            isActive={state.currentStep === 1}
+            isCompleted={state.currentStep > 1}
+            date={state.travelDate}
+            onChange={actions.setTravelDate}
+            onNext={actions.goToNextStep}
+            onEdit={() => actions.setCurrentStep(1)}
+          />
 
           {/* Step 2: Number of Days */}
           <FormStep
