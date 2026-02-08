@@ -16,6 +16,7 @@ import Animated, {
     FadeOut,
     Layout,
     withSpring,
+    withDelay,
 } from "react-native-reanimated";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { colors } from "../constants/colors";
@@ -38,16 +39,36 @@ export function DateStep({
     onEdit,
 }: DateStepProps) {
     // 0 = active, 1 = completed
-    const completionProgress = useSharedValue(isCompleted ? 1 : 0);
+    const textProgress = useSharedValue(isCompleted ? 1 : 0);
+    const containerProgress = useSharedValue(isCompleted ? 1 : 0);
     const [showPicker, setShowPicker] = useState(false);
 
     useEffect(() => {
-        completionProgress.value = withSpring(isCompleted ? 1 : 0, {
+        // Text animates immediately
+        textProgress.value = withSpring(isCompleted ? 1 : 0, {
             mass: 1,
             damping: 30,
             stiffness: 250,
             overshootClamping: false,
         });
+
+        // Container animates with delay when completing (to let text settle)
+        // Animates immediately when going back to active
+        if (isCompleted) {
+            containerProgress.value = withDelay(200, withSpring(1, {
+                mass: 1,
+                damping: 30,
+                stiffness: 250,
+                overshootClamping: false,
+            }));
+        } else {
+            containerProgress.value = withSpring(0, {
+                mass: 1,
+                damping: 30,
+                stiffness: 250,
+                overshootClamping: false,
+            });
+        }
     }, [isCompleted]);
 
     const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -60,18 +81,18 @@ export function DateStep({
         }
     };
 
-    // Main container styles
+    // Main container styles - uses delayed progress
     const containerAnimatedStyle = useAnimatedStyle(() => {
         // Transparent background when completed
         const backgroundColor = interpolateColor(
-            completionProgress.value,
+            containerProgress.value,
             [0, 1],
             [colors.white, "rgba(255, 255, 255, 0)"]
         );
 
         // Fade out border
         const borderColor = interpolateColor(
-            completionProgress.value,
+            containerProgress.value,
             [0, 1],
             [
                 isActive ? colors.regalNavy : colors.borderLight,
@@ -82,11 +103,11 @@ export function DateStep({
         return {
             borderColor,
             backgroundColor,
-            borderWidth: interpolate(completionProgress.value, [0, 1], [1.5, 0]),
-            paddingHorizontal: interpolate(completionProgress.value, [0, 1], [0, 0]), // Explicitly handle padding if needed
-            shadowOpacity: interpolate(completionProgress.value, [0, 1], [0.06, 0]),
-            elevation: interpolate(completionProgress.value, [0, 1], [2, 0]),
-            shadowRadius: interpolate(completionProgress.value, [0, 1], [8, 0]),
+            borderWidth: interpolate(containerProgress.value, [0, 1], [1.5, 0]),
+            paddingHorizontal: interpolate(containerProgress.value, [0, 1], [0, 0]), // Explicitly handle padding if needed
+            shadowOpacity: interpolate(containerProgress.value, [0, 1], [0.06, 0]),
+            elevation: interpolate(containerProgress.value, [0, 1], [2, 0]),
+            shadowRadius: interpolate(containerProgress.value, [0, 1], [8, 0]),
             marginBottom: 12,
             overflow: "hidden",
         };
@@ -95,20 +116,20 @@ export function DateStep({
     // Title styles
     const disappearingContentStyle = useAnimatedStyle(() => {
         return {
-            opacity: 1 - completionProgress.value,
+            opacity: 1 - textProgress.value,
             height: isCompleted ? 0 : "auto",
             overflow: "hidden",
-            marginBottom: interpolate(completionProgress.value, [0, 1], [14, 0]),
+            marginBottom: interpolate(textProgress.value, [0, 1], [14, 0]),
         };
     }, [isCompleted]);
 
-    // Dot style
+    // Dot style - uses text progress (appears with text change)
     const dotStyle = useAnimatedStyle(() => {
         return {
-            opacity: completionProgress.value,
-            transform: [{ scale: completionProgress.value }],
-            width: interpolate(completionProgress.value, [0, 1], [0, 6]),
-            marginRight: interpolate(completionProgress.value, [0, 1], [0, 10]),
+            opacity: textProgress.value,
+            transform: [{ scale: textProgress.value }],
+            width: interpolate(textProgress.value, [0, 1], [0, 6]),
+            marginRight: interpolate(textProgress.value, [0, 1], [0, 10]),
             height: 6,
             borderRadius: 3,
             backgroundColor: colors.regalNavy,
@@ -117,8 +138,8 @@ export function DateStep({
 
     const textAnimatedStyle = useAnimatedStyle(() => {
         return {
-            fontSize: interpolate(completionProgress.value, [0, 1], [17, 24]),
-            color: interpolateColor(completionProgress.value, [0, 1], [colors.regalNavy, colors.carbonBlack]),
+            fontSize: interpolate(textProgress.value, [0, 1], [17, 24]),
+            color: interpolateColor(textProgress.value, [0, 1], [colors.regalNavy, colors.carbonBlack]),
         };
     });
 
