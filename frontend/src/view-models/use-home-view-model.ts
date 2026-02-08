@@ -29,6 +29,7 @@ export const useHomeViewModel = () => {
     const [isFocused, setIsFocused] = useState(false);
     const [countries, setCountries] = useState<CountrySuggestion[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isPreGenerating, setIsPreGenerating] = useState(false); // Visual delay state
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -108,6 +109,15 @@ export const useHomeViewModel = () => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
 
+        if (process.env.EXPO_OS === "ios") {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
+
+        // START VISUAL DELAY (1s)
+        setIsPreGenerating(true);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        setIsPreGenerating(false);
         setIsGenerating(true);
         setError(null);
 
@@ -177,6 +187,7 @@ export const useHomeViewModel = () => {
             isFocused,
             countries,
             isLoading,
+            isPreGenerating,
             isGenerating,
             error,
             showDatePicker,

@@ -36,8 +36,12 @@ export interface Itinerary {
     days: Day[];
 }
 
+import { MOCK_TOKYO_ITINERARY } from "../constants/mock-trip";
+
 export class ApiService {
     private baseUrl: string;
+    // Toggle this to enable/disable simulation globally
+    private SIMULATION_MODE = true;
 
     constructor(baseUrl: string = API_BASE_URL) {
         this.baseUrl = baseUrl;
@@ -51,6 +55,19 @@ export class ApiService {
         days: number,
         startDate: Date
     ): Promise<Itinerary> {
+        if (this.SIMULATION_MODE) {
+            console.log("[API] SIMULATION MODE ACTIVE");
+            await new Promise((resolve) => setTimeout(resolve, 2500)); // Simulate generation delay
+
+            // Return mock ID
+            return {
+                ...MOCK_TOKYO_ITINERARY,
+                id: "mock-trip-tokyo",
+                // Override with user request if needed, or just return loading Tokyo
+                destination: destination || MOCK_TOKYO_ITINERARY.destination,
+            };
+        }
+
         const url = `${this.baseUrl}/api/v1/generate`;
         const body = {
             destination,
@@ -92,6 +109,12 @@ export class ApiService {
      * Enrich activities with images.
      */
     async enrichImages(keywords: string[]): Promise<Record<string, string>> {
+        if (this.SIMULATION_MODE) {
+            console.log("[API] SIMULATION: Returning mock images");
+            // Return empty or pre-filled map, assuming mock data already has images
+            return {};
+        }
+
         const response = await fetch(`${this.baseUrl}/api/v1/enrich-images`, {
             method: "POST",
             headers: {
@@ -112,6 +135,12 @@ export class ApiService {
      * Get a saved trip by ID.
      */
     async getTrip(tripId: string): Promise<Itinerary> {
+        if (this.SIMULATION_MODE || tripId === "mock-trip-tokyo") {
+            console.log("[API] SIMULATION: Returning mock trip for", tripId);
+            await new Promise((resolve) => setTimeout(resolve, 800)); // Simulate fetch delay
+            return MOCK_TOKYO_ITINERARY;
+        }
+
         const response = await fetch(`${this.baseUrl}/api/v1/trips/${tripId}`);
 
         if (!response.ok) {
