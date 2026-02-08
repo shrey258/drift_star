@@ -5,6 +5,7 @@ import {
   Pressable,
   ScrollView,
   ActivityIndicator,
+  Modal,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
@@ -259,11 +260,10 @@ export default function HomeScreen() {
             <View
               style={{
                 backgroundColor: colors.white,
-                borderRadius: 14,
+                borderRadius: 16,
                 borderWidth: 1,
                 borderColor: colors.borderLight,
-                padding: 12,
-                alignItems: "center",
+                overflow: "hidden",
               }}
             >
               <DateTimePicker
@@ -271,12 +271,14 @@ export default function HomeScreen() {
                 mode="date"
                 display="inline"
                 minimumDate={new Date()}
+                themeVariant="light"
+                accentColor={colors.regalNavy}
                 onChange={(event, selectedDate) => {
                   if (selectedDate) {
                     actions.setTravelDate(selectedDate);
                   }
                 }}
-                style={{ height: 320, width: "100%" }}
+                style={{ alignSelf: "center" }}
               />
             </View>
           </FormStep>

@@ -2,7 +2,7 @@
  * API service for Drift Star backend.
  */
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL = "https://63a9-117-195-163-229.ngrok-free.app";
 
 export interface GenerateItineraryRequest {
     destination: string;
@@ -51,24 +51,41 @@ export class ApiService {
         days: number,
         startDate: Date
     ): Promise<Itinerary> {
-        const response = await fetch(`${this.baseUrl}/api/v1/generate`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                destination,
-                days,
-                start_date: startDate.toISOString().split("T")[0], // YYYY-MM-DD
-            }),
-        });
+        const url = `${this.baseUrl}/api/v1/generate`;
+        const body = {
+            destination,
+            days,
+            start_date: startDate.toISOString().split("T")[0], // YYYY-MM-DD
+        };
 
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.detail || `API error: ${response.status}`);
+        console.log("[API] Generating itinerary...");
+        console.log("[API] URL:", url);
+        console.log("[API] Body:", JSON.stringify(body, null, 2));
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+            });
+
+            console.log("[API] Response status:", response.status);
+
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                console.error("[API] Error response:", error);
+                throw new Error(error.detail || `API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("[API] Success! Trip ID:", data.id);
+            return data;
+        } catch (err) {
+            console.error("[API] Network error:", err);
+            throw err;
         }
-
-        return response.json();
     }
 
     /**

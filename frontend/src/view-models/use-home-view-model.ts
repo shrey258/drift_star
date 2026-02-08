@@ -31,6 +31,7 @@ export const useHomeViewModel = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const inputRef = useRef<TextInput>(null);
     const buttonScale = useSharedValue(1);
@@ -178,6 +179,7 @@ export const useHomeViewModel = () => {
             isLoading,
             isGenerating,
             error,
+            showDatePicker,
             isCurrentStepValid,
             isLastStep,
         },
@@ -191,6 +193,7 @@ export const useHomeViewModel = () => {
             setDestination,
             setTravelDate,
             setNumberOfDays,
+            setShowDatePicker,
             handleInputFocus,
             handleInputBlur,
             handleDestinationSelect,
