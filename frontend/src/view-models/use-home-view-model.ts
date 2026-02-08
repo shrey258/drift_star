@@ -194,6 +194,7 @@ export const useHomeViewModel = () => {
             setTravelDate,
             setNumberOfDays,
             setShowDatePicker,
+            setCurrentStep,
             handleInputFocus,
             handleInputBlur,
             handleDestinationSelect,

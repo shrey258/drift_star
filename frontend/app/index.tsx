@@ -21,6 +21,7 @@ import { Image } from "expo-image";
 import { useHomeViewModel } from "../src/view-models/use-home-view-model";
 import { SUGGESTIONS } from "../src/constants/suggestions";
 import { FormStep } from "../src/components/form-step";
+import { DestinationStep } from "../src/components/destination-step";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -86,168 +87,23 @@ export default function HomeScreen() {
 
         {/* Form Steps */}
         <View style={{ flex: 1 }}>
-          {/* Step 0: Destination */}
-          <FormStep
-            stepIndex={0}
-            currentStep={state.currentStep}
-            title="Where to?"
-            completedSummary={state.destination}
-            onEdit={() => actions.goToPreviousStep()}
-          >
-            <Animated.View
-              style={[
-                {
-                  backgroundColor: colors.white,
-                  borderRadius: 14,
-                  borderWidth: 1.5,
-                  borderCurve: "continuous",
-                  boxShadow: "0 2px 8px rgba(27, 27, 27, 0.06)",
-                },
-                inputAnimatedStyle,
-              ]}
-            >
-              <TextInput
-                ref={refs.inputRef}
-                value={state.destination}
-                onChangeText={actions.setDestination}
-                onFocus={actions.handleInputFocus}
-                onBlur={actions.handleInputBlur}
-                placeholder="Enter a destination..."
-                placeholderTextColor={colors.paleOak}
-                style={{
-                  fontSize: 17,
-                  color: colors.carbonBlack,
-                  paddingHorizontal: 18,
-                  paddingVertical: 18,
-                }}
-                autoCapitalize="words"
-                autoCorrect={false}
-                returnKeyType="next"
-                onSubmitEditing={() => {
-                  if (state.isCurrentStepValid) actions.goToNextStep();
-                }}
-              />
-              {state.isLoading && (
-                <ActivityIndicator
-                  size="small"
-                  color={colors.regalNavy}
-                  style={{ position: "absolute", right: 18, top: 18 }}
-                />
-              )}
-            </Animated.View>
-
-            {/* Autocomplete List */}
-            {state.countries.length > 0 && state.isFocused && (
-              <Animated.View
-                entering={FadeIn.duration(150)}
-                style={{
-                  marginTop: 8,
-                  backgroundColor: colors.white,
-                  borderRadius: 12,
-                  borderWidth: 1,
-                  borderColor: colors.borderLight,
-                  boxShadow: "0 8px 24px rgba(27, 27, 27, 0.12)",
-                  overflow: "hidden",
-                }}
-              >
-                {state.countries.map((country, index) => (
-                  <Pressable
-                    key={country.name.common}
-                    onPress={() =>
-                      actions.handleDestinationSelect(
-                        country.name.common,
-                        country.flags.png
-                      )
-                    }
-                    style={({ pressed }) => ({
-                      flexDirection: "row",
-                      alignItems: "center",
-                      padding: 14,
-                      backgroundColor: pressed
-                        ? colors.primaryLight
-                        : "transparent",
-                      borderBottomWidth:
-                        index === state.countries.length - 1 ? 0 : 1,
-                      borderBottomColor: colors.borderLight,
-                    })}
-                  >
-                    <Image
-                      source={{ uri: country.flags.png }}
-                      style={{
-                        width: 24,
-                        height: 16,
-                        borderRadius: 2,
-                        marginRight: 12,
-                      }}
-                      contentFit="cover"
-                    />
-                    <Text style={{ fontSize: 16, color: colors.carbonBlack }}>
-                      {country.name.common}
-                    </Text>
-                  </Pressable>
-                ))}
-              </Animated.View>
-            )}
-
-            {/* Quick Suggestions */}
-            <View style={{ marginTop: 16 }}>
-              <Text
-                style={{
-                  fontSize: 11,
-                  fontWeight: "600",
-                  color: colors.ashBrown,
-                  letterSpacing: 0.5,
-                  textTransform: "uppercase",
-                  marginBottom: 10,
-                }}
-              >
-                Popular
-              </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  gap: 8,
-                }}
-              >
-                {SUGGESTIONS.map((item) => {
-                  const isSelected = state.destination === item.name;
-                  return (
-                    <Pressable
-                      key={item.name}
-                      onPress={() => actions.handleDestinationSelect(item.name)}
-                      style={({ pressed }) => ({
-                        backgroundColor: isSelected
-                          ? colors.primaryLight
-                          : colors.white,
-                        borderRadius: 8,
-                        borderCurve: "continuous",
-                        paddingHorizontal: 12,
-                        paddingVertical: 8,
-                        borderWidth: 1,
-                        borderColor: isSelected
-                          ? colors.regalNavy
-                          : colors.borderLight,
-                        opacity: pressed ? 0.7 : 1,
-                      })}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 13,
-                          fontWeight: "500",
-                          color: isSelected
-                            ? colors.regalNavy
-                            : colors.carbonBlack,
-                        }}
-                      >
-                        {item.emoji} {item.name}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
-          </FormStep>
+          {/* Step 0: Destination - Custom Component for Morphing Animation */}
+          <DestinationStep
+            isActive={state.currentStep === 0}
+            isCompleted={state.currentStep > 0}
+            value={state.destination}
+            onChangeText={actions.setDestination}
+            onFocus={actions.handleInputFocus}
+            onBlur={actions.handleInputBlur}
+            onNext={actions.goToNextStep}
+            onEdit={() => actions.setCurrentStep(0)}
+            suggestions={state.countries}
+            onSelectSuggestion={(name: string, flag?: string) => {
+              actions.handleDestinationSelect(name, flag);
+            }}
+            isLoading={state.isLoading}
+            inputRef={refs.inputRef}
+          />
 
           {/* Step 1: Date */}
           <FormStep
