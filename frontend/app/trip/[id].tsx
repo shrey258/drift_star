@@ -1,13 +1,13 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, SectionList, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
-import { Image } from "expo-image";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useEffect } from "react";
 import { colors } from "../../src/constants/colors";
-import { DayTabBar } from "../../src/components/day-tab-bar";
-import { ActivityCard } from "../../src/components/activity-card";
 import { useTripViewModel } from "../../src/view-models/use-trip-view-model";
+import { ActivityCard } from "../../src/components/activity-card";
+import { Day, Activity } from "../../src/services/api-service";
+import { BlurView } from "expo-blur";
 
 export default function TripScreen() {
     const insets = useSafeAreaInsets();
@@ -23,6 +23,7 @@ export default function TripScreen() {
         }
     }, [state.itinerary?.id]);
 
+    // Loading State
     if (state.isLoading) {
         return (
             <View
@@ -41,6 +42,7 @@ export default function TripScreen() {
         );
     }
 
+    // Error State
     if (state.error || !state.itinerary) {
         return (
             <View
@@ -91,9 +93,9 @@ export default function TripScreen() {
         );
     }
 
-    const { itinerary, currentDay, days, selectedDay } = state;
+    const { itinerary } = state;
 
-    // Format date range
+    // Helper: Format date range
     const formatDateRange = () => {
         if (!itinerary.start_date) return null;
         const start = new Date(itinerary.start_date);
@@ -102,156 +104,176 @@ export default function TripScreen() {
         return `${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}`;
     };
 
+    // Prepare Sections for SectionList
+    const sections = itinerary.days.map((day) => ({
+        day: day, // Keep ref to full day object
+        data: day.activities, // Items for this section
+    }));
+
     return (
         <View style={{ flex: 1, backgroundColor: colors.background }}>
-            <ScrollView
+            <SectionList
+                sections={sections}
+                keyExtractor={(item: Activity) => item.id}
+                stickySectionHeadersEnabled={true}
                 contentContainerStyle={{
-                    paddingBottom: insets.bottom + 24,
+                    paddingBottom: insets.bottom + 32,
                 }}
                 showsVerticalScrollIndicator={false}
-            >
-                {/* Header */}
-                <View
-                    style={{
-                        paddingTop: insets.top + 16,
-                        paddingHorizontal: 24,
-                        paddingBottom: 20,
-                    }}
-                >
-                    {/* Back Button */}
-                    <Pressable
-                        onPress={() => router.back()}
-                        style={({ pressed }) => ({
-                            flexDirection: "row",
-                            alignItems: "center",
-                            marginBottom: 20,
-                            opacity: pressed ? 0.6 : 1,
-                        })}
+                // Sticky Header Component (Day Title)
+                renderSectionHeader={({ section: { day } }) => (
+                    <BlurView
+                        intensity={Platform.OS === 'ios' ? 80 : 0}
+                        tint="light"
+                        style={{
+                            paddingTop: Platform.OS === 'ios' ? insets.top : 12, // Add safe area for iOS sticky state
+                            paddingBottom: 12,
+                            paddingHorizontal: 24,
+                            // Fallback background for Android or non-blur
+                            backgroundColor: Platform.OS === 'ios' ? 'rgba(255,255,255,0.85)' : colors.background,
+                            borderBottomWidth: 1,
+                            borderBottomColor: 'rgba(0,0,0,0.05)',
+                        }}
                     >
-                        <Text style={{ fontSize: 15, color: colors.ashBrown }}>← Back</Text>
-                    </Pressable>
-
-                    {/* Trip Title */}
-                    <Animated.View entering={FadeInDown.duration(400)}>
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                marginBottom: 8,
-                            }}
-                        >
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
                             <View
                                 style={{
-                                    backgroundColor: colors.primaryLight,
-                                    borderRadius: 8,
-                                    paddingHorizontal: 10,
+                                    backgroundColor: colors.regalNavy,
+                                    borderRadius: 6,
+                                    paddingHorizontal: 8,
                                     paddingVertical: 4,
+                                    marginRight: 10,
                                 }}
                             >
                                 <Text
                                     style={{
-                                        fontSize: 12,
+                                        fontSize: 11,
                                         fontWeight: "700",
-                                        color: colors.regalNavy,
+                                        color: colors.white,
                                         textTransform: "uppercase",
                                     }}
                                 >
-                                    {itinerary.destination}
+                                    Day {day.day_number}
                                 </Text>
                             </View>
-                            {formatDateRange() && (
-                                <Text
-                                    style={{
-                                        marginLeft: 10,
-                                        fontSize: 13,
-                                        color: colors.ashBrown,
-                                    }}
-                                >
-                                    {formatDateRange()}
-                                </Text>
-                            )}
+                            <Text
+                                style={{
+                                    fontSize: 16,
+                                    fontWeight: "700",
+                                    color: colors.carbonBlack,
+                                    flex: 1,
+                                }}
+                                numberOfLines={1}
+                            >
+                                {day.theme_title.replace(/^Day \d+:\s*/, "")}
+                            </Text>
                         </View>
-
-                        <Text
-                            style={{
-                                fontSize: 28,
-                                fontWeight: "700",
-                                color: colors.carbonBlack,
-                                lineHeight: 36,
-                            }}
-                        >
-                            {itinerary.trip_title}
-                        </Text>
-                    </Animated.View>
-                </View>
-
-                {/* Day Tabs */}
-                <DayTabBar
-                    days={days}
-                    selectedDay={selectedDay}
-                    onSelectDay={actions.selectDay}
-                />
-
-                {/* Current Day Header */}
-                {currentDay && (
-                    <Animated.View
-                        entering={FadeIn.duration(300)}
-                        style={{ paddingHorizontal: 24, marginBottom: 20 }}
-                    >
-                        <Text
-                            style={{
-                                fontSize: 20,
-                                fontWeight: "700",
-                                color: colors.carbonBlack,
-                                marginBottom: 4,
-                            }}
-                        >
-                            {currentDay.theme_title}
-                        </Text>
-                        <Text style={{ fontSize: 14, color: colors.ashBrown }}>
-                            {currentDay.activities.length} activities planned
-                        </Text>
-                    </Animated.View>
+                    </BlurView>
                 )}
-
-                {/* Activities Timeline */}
-                <View style={{ paddingHorizontal: 24 }}>
-                    {currentDay?.activities.map((activity, index) => (
+                // List Item (Activity Card)
+                renderItem={({ item, index }) => (
+                    <View style={{ paddingHorizontal: 24, paddingTop: 16 }}>
                         <ActivityCard
-                            key={activity.id}
-                            activity={activity}
+                            activity={item}
                             index={index}
-                            onEdit={() => actions.openEditSheet(activity)}
-                        />
-                    ))}
-                </View>
-
-                {/* Empty State */}
-                {currentDay?.activities.length === 0 && (
-                    <View
-                        style={{
-                            paddingHorizontal: 24,
-                            paddingVertical: 48,
-                            alignItems: "center",
-                        }}
-                    >
-                        <Text style={{ fontSize: 48, marginBottom: 12 }}>🗓️</Text>
-                        <Text
-                            style={{
-                                fontSize: 16,
-                                fontWeight: "600",
-                                color: colors.carbonBlack,
-                                marginBottom: 4,
+                            onEdit={() => {
+                                // TODO: Edit action
+                                console.log("Edit:", item.id);
                             }}
-                        >
-                            No activities yet
-                        </Text>
-                        <Text style={{ fontSize: 14, color: colors.ashBrown }}>
-                            Add activities to this day
-                        </Text>
+                        />
                     </View>
                 )}
-            </ScrollView>
+                // Page Header (Trip Info)
+                ListHeaderComponent={
+                    <View
+                        style={{
+                            paddingTop: insets.top + 16,
+                            paddingHorizontal: 24,
+                            paddingBottom: 8, // Reduced from 24 to avoid huge gap before Day 1
+                            backgroundColor: colors.background, // Ensure opaque background
+                        }}
+                    >
+                        {/* Back Button */}
+                        <Pressable
+                            onPress={() => router.back()}
+                            style={({ pressed }) => ({
+                                flexDirection: "row",
+                                alignItems: "center",
+                                marginBottom: 20,
+                                alignSelf: 'flex-start',
+                                opacity: pressed ? 0.6 : 1,
+                            })}
+                        >
+                            <Text style={{ fontSize: 15, color: colors.ashBrown }}>← Back</Text>
+                        </Pressable>
+
+                        {/* Trip Title & Metadata */}
+                        <Animated.View entering={FadeInDown.duration(400)}>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    marginBottom: 8,
+                                }}
+                            >
+                                <View
+                                    style={{
+                                        backgroundColor: colors.primaryLight,
+                                        borderRadius: 8,
+                                        paddingHorizontal: 10,
+                                        paddingVertical: 4,
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            fontSize: 12,
+                                            fontWeight: "700",
+                                            color: colors.regalNavy,
+                                            textTransform: "uppercase",
+                                        }}
+                                    >
+                                        {itinerary.destination}
+                                    </Text>
+                                </View>
+                                {formatDateRange() && (
+                                    <Text
+                                        style={{
+                                            marginLeft: 10,
+                                            fontSize: 13,
+                                            color: colors.ashBrown,
+                                        }}
+                                    >
+                                        {formatDateRange()}
+                                    </Text>
+                                )}
+                            </View>
+
+                            <Text
+                                style={{
+                                    fontSize: 28,
+                                    fontWeight: "700",
+                                    color: colors.carbonBlack,
+                                    lineHeight: 36,
+                                }}
+                            >
+                                {itinerary.trip_title}
+                            </Text>
+
+                            <Text
+                                style={{
+                                    fontSize: 14,
+                                    color: colors.ashBrown,
+                                    marginTop: 8,
+                                }}
+                            >
+                                {itinerary.days.length} days • {itinerary.days.reduce((acc, day) => acc + day.activities.length, 0)} activities
+                            </Text>
+                        </Animated.View>
+                    </View>
+                }
+                // Empty Section Footer (spacing)
+                renderSectionFooter={() => <View style={{ height: 12 }} />}
+            />
         </View>
     );
 }

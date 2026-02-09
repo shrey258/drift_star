@@ -37,56 +37,21 @@ function formatDuration(minutes: number): string {
 
 export function ActivityCard({ activity, index, onEdit }: ActivityCardProps) {
     return (
-        <Animated.View
-            entering={FadeIn.duration(400).delay(index * 80)}
-            style={{
-                flexDirection: "row",
-                marginBottom: 16,
-            }}
-        >
-            {/* Timeline Connector */}
-            <View style={{ width: 56, alignItems: "center" }}>
-                <Text
-                    style={{
-                        fontSize: 12,
-                        fontWeight: "600",
-                        color: colors.ashBrown,
-                        marginBottom: 8,
-                    }}
-                >
-                    {formatTime(activity.start_time)}
-                </Text>
-                <View
-                    style={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: 5,
-                        backgroundColor: colors.regalNavy,
-                        marginBottom: 4,
-                    }}
-                />
-                <View
-                    style={{
-                        flex: 1,
-                        width: 2,
-                        backgroundColor: colors.borderLight,
-                        minHeight: 80,
-                    }}
-                />
-            </View>
-
-            {/* Card */}
+        <Animated.View entering={FadeIn.duration(300).delay(index * 60)}>
             <Pressable
                 onPress={onEdit}
                 style={({ pressed }) => ({
-                    flex: 1,
                     backgroundColor: colors.white,
                     borderRadius: 16,
                     borderCurve: "continuous",
                     overflow: "hidden",
                     borderWidth: 1,
                     borderColor: colors.borderLight,
-                    boxShadow: "0 2px 12px rgba(27, 27, 27, 0.06)",
+                    shadowColor: "rgb(27, 27, 27)",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.06,
+                    shadowRadius: 8,
+                    elevation: 2,
                     opacity: pressed ? 0.95 : 1,
                     transform: [{ scale: pressed ? 0.98 : 1 }],
                 })}
@@ -95,7 +60,7 @@ export function ActivityCard({ activity, index, onEdit }: ActivityCardProps) {
                 {activity.image_url && (
                     <Image
                         source={{ uri: activity.image_url }}
-                        style={{ width: "100%", height: 140 }}
+                        style={{ width: "100%", height: 160 }}
                         contentFit="cover"
                         transition={300}
                     />
@@ -103,11 +68,13 @@ export function ActivityCard({ activity, index, onEdit }: ActivityCardProps) {
 
                 {/* Content */}
                 <View style={{ padding: 16 }}>
+                    {/* Time & Duration Row */}
                     <View
                         style={{
                             flexDirection: "row",
                             alignItems: "center",
-                            marginBottom: 8,
+                            marginBottom: 10,
+                            gap: 8,
                         }}
                     >
                         <View
@@ -121,28 +88,25 @@ export function ActivityCard({ activity, index, onEdit }: ActivityCardProps) {
                             <Text
                                 style={{
                                     fontSize: 11,
-                                    fontWeight: "600",
+                                    fontWeight: "700",
                                     color: colors.regalNavy,
                                 }}
                             >
-                                {formatDuration(activity.duration_minutes)}
+                                {formatTime(activity.start_time)}
                             </Text>
                         </View>
-                        {onEdit && (
-                            <Text
-                                style={{
-                                    marginLeft: "auto",
-                                    fontSize: 11,
-                                    fontWeight: "700",
-                                    color: colors.ashBrown,
-                                    textTransform: "uppercase",
-                                }}
-                            >
-                                Edit
-                            </Text>
-                        )}
+                        <Text
+                            style={{
+                                fontSize: 11,
+                                fontWeight: "500",
+                                color: colors.ashBrown,
+                            }}
+                        >
+                            • {formatDuration(activity.duration_minutes)}
+                        </Text>
                     </View>
 
+                    {/* Name */}
                     <Text
                         style={{
                             fontSize: 17,
@@ -155,6 +119,7 @@ export function ActivityCard({ activity, index, onEdit }: ActivityCardProps) {
                         {activity.name}
                     </Text>
 
+                    {/* Description */}
                     <Text
                         style={{
                             fontSize: 14,
@@ -167,6 +132,7 @@ export function ActivityCard({ activity, index, onEdit }: ActivityCardProps) {
                         {activity.description}
                     </Text>
 
+                    {/* Location */}
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <Text style={{ fontSize: 14 }}>📍</Text>
                         <Text
