@@ -138,7 +138,7 @@ export default function HomeScreen() {
             Where to next?
           </Text>
           <Text style={{ fontSize: 16, color: colors.ashBrown, marginTop: 8, fontWeight: '500' }}>
-            Plan your next journey with AI intelligence.
+            Plan your next journey with Drift Star.
           </Text>
         </Animated.View>
 
