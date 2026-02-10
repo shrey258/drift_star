@@ -16,7 +16,8 @@
           "NSAllowsLocalNetworking": true
         },
         "NSCalendarsUsageDescription": "This app needs access to your calendar to export your trip activities."
-      }
+      },
+      "bundleIdentifier": "com.gshrey258.driftstar"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,8 +30,11 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "READ_CALENDAR",
+        "WRITE_CALENDAR",
+        "READ_CALENDAR",
         "WRITE_CALENDAR"
-      ]
+      ],
+      "package": "com.gshrey258.frontend"
     },
     "web": {
       "output": "static",

@@ -108,9 +108,7 @@ export default function TripsScreen() {
                     // Trip Grid
                     <View
                         style={{
-                            flexDirection: 'row',
-                            flexWrap: 'wrap',
-                            gap: 16,
+                            gap: 20,
                         }}
                     >
                         {trips.map((trip, index) => (

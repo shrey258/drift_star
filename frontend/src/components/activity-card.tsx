@@ -4,6 +4,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { Image } from "expo-image";
 import { colors } from "../constants/colors";
 import * as Haptics from "expo-haptics";
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface Activity {
     id: string;
@@ -93,24 +94,24 @@ export function ActivityCard({ activity, index, onEdit, onDelete, onAddToCalenda
             >
                 {/* Image */}
                 {activity.image_url && (
-                    <View style={{ position: "relative" }}>
+                    <View style={{ position: "relative", overflow: 'hidden' }}>
                         <Image
                             source={{ uri: activity.image_url }}
                             style={{ width: "100%", height: 180 }}
                             contentFit="cover"
                             transition={300}
                         />
-                        {/* Gradient overlay for better text contrast */}
-                        <View
+                        {/* Smooth gradient overlay for better text contrast */}
+                        <LinearGradient
+                            colors={['transparent', 'rgba(0,0,0,0.2)']}
                             style={{
                                 position: "absolute",
                                 bottom: 0,
                                 left: 0,
                                 right: 0,
                                 height: 60,
-                                backgroundColor: "rgba(0,0,0,0.15)",
-                                pointerEvents: "none",
                             }}
+                            pointerEvents="none"
                         />
                     </View>
                 )}
