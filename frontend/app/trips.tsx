@@ -5,10 +5,11 @@ import { useState, useEffect } from 'react';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { colors } from '../src/constants/colors';
 import { storageService } from '../src/services/storage-service';
+import { calendarService } from '../src/services/calendar-service';
 import { Itinerary } from '../src/services/api-service';
 import { TripCard } from '../src/components/trip-card';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
+import { Platform, Alert } from 'react-native';
 
 export default function TripsScreen() {
     const insets = useSafeAreaInsets();
@@ -25,6 +26,46 @@ export default function TripsScreen() {
         const savedTrips = await storageService.getAllTrips();
         setTrips(savedTrips);
         setIsLoading(false);
+    };
+
+    const handleDeleteTrip = async (tripId: string, tripTitle: string) => {
+        if (Platform.OS === 'ios') {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        }
+
+        Alert.alert(
+            'Delete Trip',
+            `Are you sure you want to delete "${tripTitle}"? This will also remove any exported events from your calendar.`,
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            // 1. Get and delete calendar events
+                            const eventIds = await storageService.getCalendarEvents(tripId);
+                            if (eventIds.length > 0) {
+                                await calendarService.deleteEvents(eventIds);
+                            }
+
+                            // 2. Delete trip from storage
+                            await storageService.deleteItinerary(tripId);
+
+                            // 3. Reload list
+                            await loadTrips();
+
+                            if (Platform.OS === 'ios') {
+                                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                            }
+                        } catch (error) {
+                            console.error('[Trips] Failed to delete trip:', error);
+                            Alert.alert('Error', 'Failed to delete trip.');
+                        }
+                    }
+                }
+            ]
+        );
     };
 
     return (
@@ -112,7 +153,12 @@ export default function TripsScreen() {
                         }}
                     >
                         {trips.map((trip, index) => (
-                            <TripCard key={trip.id} trip={trip} index={index} />
+                            <TripCard
+                                key={trip.id}
+                                trip={trip}
+                                index={index}
+                                onLongPress={() => handleDeleteTrip(trip.id, trip.trip_title)}
+                            />
                         ))}
                     </View>
                 )}

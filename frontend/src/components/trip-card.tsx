@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 interface TripCardProps {
     trip: Itinerary;
     index: number;
+    onLongPress?: () => void;
 }
 
 function formatDateRange(startDate?: string, days?: number): string {
@@ -26,8 +27,15 @@ function formatDateRange(startDate?: string, days?: number): string {
     return `${startStr} - ${endStr}`;
 }
 
-export function TripCard({ trip, index }: TripCardProps) {
+export function TripCard({ trip, index, onLongPress }: TripCardProps) {
     const router = useRouter();
+
+    const handlePress = () => {
+        if (Platform.OS === 'ios') {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        }
+        router.push(`/trip/${trip.id}`);
+    };
 
     // Get first activity image or use placeholder
     const imageUrl = trip.days[0]?.activities[0]?.image_url;
@@ -37,33 +45,31 @@ export function TripCard({ trip, index }: TripCardProps) {
 
     return (
         <Animated.View
-            entering={FadeIn.duration(400)}
-            style={{ width: '100%', marginBottom: 16 }}
+            entering={FadeIn.duration(400).delay(index * 100)}
+            style={{
+                width: '100%',
+                aspectRatio: 3 / 2,
+                borderRadius: 24,
+                backgroundColor: colors.white,
+                overflow: 'hidden',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.12,
+                shadowRadius: 16,
+                elevation: 4,
+            }}
         >
             <Pressable
-                onPress={() => {
-                    if (Platform.OS === 'ios') {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    }
-                    router.push(`/trip/${trip.id}`);
-                }}
+                onPress={handlePress}
+                onLongPress={onLongPress}
                 style={({ pressed }) => ({
-                    backgroundColor: colors.white,
-                    borderRadius: 24,
-                    borderCurve: 'continuous',
-                    overflow: 'hidden',
-                    borderWidth: 1,
-                    borderColor: colors.borderLight,
+                    flex: 1,
+                    opacity: pressed ? 0.95 : 1,
                     transform: [{ scale: pressed ? 0.98 : 1 }],
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 12,
-                    elevation: 5,
                 })}
             >
                 {/* Image Section */}
-                <View style={{ height: 220, position: 'relative', overflow: 'hidden' }}>
+                <View style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
                     {imageUrl ? (
                         <Image
                             source={{ uri: imageUrl }}

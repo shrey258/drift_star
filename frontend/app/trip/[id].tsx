@@ -12,6 +12,7 @@ import * as Haptics from "expo-haptics";
 import { EditActivitySheet } from "../../src/components/edit-activity-sheet";
 import { calendarService } from "../../src/services/calendar-service";
 import { CalendarPreviewModal } from "../../src/components/calendar-preview-modal";
+import { storageService } from "../../src/services/storage-service";
 
 export default function TripScreen() {
     const insets = useSafeAreaInsets();
@@ -455,7 +456,10 @@ export default function TripScreen() {
                 onConfirm={async () => {
                     setShowCalendarPreview(false);
                     if (state.itinerary) {
-                        await calendarService.exportAllActivities(state.itinerary);
+                        const eventIds = await calendarService.exportAllActivities(state.itinerary);
+                        if (eventIds.length > 0) {
+                            await storageService.saveCalendarEvents(state.itinerary.id, eventIds);
+                        }
                     }
                 }}
                 onCancel={() => setShowCalendarPreview(false)}

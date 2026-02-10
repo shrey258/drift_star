@@ -7,8 +7,36 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Itinerary } from './api-service';
 
 const STORAGE_PREFIX = '@drift_star:trip:';
+const EVENT_MAPPING_PREFIX = '@drift_star:calendar_events:';
 
 export class StorageService {
+    /**
+     * Save calendar event IDs associated with a trip.
+     */
+    async saveCalendarEvents(tripId: string, eventIds: string[]): Promise<void> {
+        try {
+            const key = `${EVENT_MAPPING_PREFIX}${tripId}`;
+            await AsyncStorage.setItem(key, JSON.stringify(eventIds));
+            console.log('[Storage] Saved calendar mapping for:', tripId);
+        } catch (error) {
+            console.error('[Storage] Failed to save calendar mapping:', error);
+        }
+    }
+
+    /**
+     * Get calendar event IDs associated with a trip.
+     */
+    async getCalendarEvents(tripId: string): Promise<string[]> {
+        try {
+            const key = `${EVENT_MAPPING_PREFIX}${tripId}`;
+            const value = await AsyncStorage.getItem(key);
+            return value ? JSON.parse(value) : [];
+        } catch (error) {
+            console.error('[Storage] Failed to get calendar mapping:', error);
+            return [];
+        }
+    }
+
     /**
      * Save an itinerary to local storage.
      */
@@ -53,8 +81,9 @@ export class StorageService {
     async deleteItinerary(tripId: string): Promise<void> {
         try {
             const key = `${STORAGE_PREFIX}${tripId}`;
-            await AsyncStorage.removeItem(key);
-            console.log('[Storage] Deleted itinerary:', tripId);
+            const mappingKey = `${EVENT_MAPPING_PREFIX}${tripId}`;
+            await AsyncStorage.multiRemove([key, mappingKey]);
+            console.log('[Storage] Deleted itinerary and mapping:', tripId);
         } catch (error) {
             console.error('[Storage] Failed to delete itinerary:', error);
             throw error;

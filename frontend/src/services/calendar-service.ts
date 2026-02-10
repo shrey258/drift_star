@@ -130,9 +130,32 @@ export class CalendarService {
     }
 
     /**
-     * Export all activities from an itinerary to the calendar.
+     * Delete multiple events from the calendar.
      */
-    async exportAllActivities(itinerary: Itinerary): Promise<number> {
+    async deleteEvents(eventIds: string[]): Promise<number> {
+        try {
+            let deletedCount = 0;
+            for (const id of eventIds) {
+                try {
+                    await Calendar.deleteEventAsync(id);
+                    deletedCount++;
+                } catch (error) {
+                    console.error('[Calendar] Failed to delete event:', id, error);
+                }
+            }
+            console.log('[Calendar] Successfully deleted events:', deletedCount);
+            return deletedCount;
+        } catch (error) {
+            console.error('[Calendar] Failed during bulk delete:', error);
+            return 0;
+        }
+    }
+
+    /**
+     * Export all activities from an itinerary to the calendar.
+     * Returns the array of created event IDs.
+     */
+    async exportAllActivities(itinerary: Itinerary): Promise<string[]> {
         try {
             // Request permissions
             const hasPermission = await this.requestPermissions();
@@ -141,22 +164,22 @@ export class CalendarService {
                     'Permission Required',
                     'Please grant calendar access to export activities.'
                 );
-                return 0;
+                return [];
             }
 
             // Get default calendar
             const calendarId = await this.getDefaultCalendarId();
             if (!calendarId) {
                 Alert.alert('Error', 'No calendar found on device.');
-                return 0;
+                return [];
             }
 
             if (!itinerary.start_date) {
                 Alert.alert('Error', 'Trip start date is missing.');
-                return 0;
+                return [];
             }
 
-            let successCount = 0;
+            const createdEventIds: string[] = [];
 
             // Iterate through all days and activities
             for (const day of itinerary.days) {
@@ -171,7 +194,7 @@ export class CalendarService {
                         const endDate = new Date(startDate);
                         endDate.setMinutes(endDate.getMinutes() + activity.duration_minutes);
 
-                        await Calendar.createEventAsync(calendarId, {
+                        const eventId = await Calendar.createEventAsync(calendarId, {
                             title: `${itinerary.trip_title} - ${activity.name}`,
                             startDate,
                             endDate,
@@ -180,27 +203,27 @@ export class CalendarService {
                             alarms: [{ relativeOffset: -60 }], // 1 hour before
                         });
 
-                        successCount++;
+                        createdEventIds.push(eventId);
                     } catch (error) {
                         console.error('[Calendar] Failed to create event for activity:', activity.name, error);
                     }
                 }
             }
 
-            if (successCount > 0) {
+            if (createdEventIds.length > 0) {
                 Alert.alert(
                     'Success',
-                    `Added ${successCount} ${successCount === 1 ? 'activity' : 'activities'} to your calendar!`
+                    `Added ${createdEventIds.length} ${createdEventIds.length === 1 ? 'activity' : 'activities'} to your calendar!`
                 );
             } else {
                 Alert.alert('Error', 'Failed to add activities to calendar.');
             }
 
-            return successCount;
+            return createdEventIds;
         } catch (error) {
             console.error('[Calendar] Failed to export activities:', error);
             Alert.alert('Error', 'Failed to export activities to calendar.');
-            return 0;
+            return [];
         }
     }
 }
