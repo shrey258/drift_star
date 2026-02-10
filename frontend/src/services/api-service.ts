@@ -34,6 +34,7 @@ export interface Itinerary {
     start_date?: string;
     end_date?: string;
     days: Day[];
+    hero_image_url?: string;
 }
 
 import { MOCK_TOKYO_ITINERARY } from "../constants/mock-trip";

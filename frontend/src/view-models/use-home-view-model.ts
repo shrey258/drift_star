@@ -146,6 +146,16 @@ export const useHomeViewModel = () => {
                 travelDate
             );
 
+            // Immediately enrich with a hero image for the destination so the card isn't blank
+            try {
+                const images = await apiService.enrichImages([destination]);
+                if (images[destination]) {
+                    itinerary.hero_image_url = images[destination];
+                }
+            } catch (err) {
+                console.error("[HomeViewModel] Failed to fetch hero image:", err);
+            }
+
             // Save to local storage so it appears in "My Trips"
             await storageService.saveItinerary(itinerary.id, itinerary);
 

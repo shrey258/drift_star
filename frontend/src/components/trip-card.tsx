@@ -37,8 +37,8 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
         router.push(`/trip/${trip.id}`);
     };
 
-    // Get first activity image or use placeholder
-    const imageUrl = trip.days[0]?.activities[0]?.image_url;
+    // Use hero image as priority, fallback to first activity image
+    const imageUrl = trip.hero_image_url || trip.days[0]?.activities[0]?.image_url;
 
     // Calculate total activities count
     const totalActivities = trip.days.reduce((acc, day) => acc + day.activities.length, 0);
@@ -71,144 +71,171 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                 {/* Image Section */}
                 <View style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
                     {imageUrl ? (
-                        <Image
-                            source={{ uri: imageUrl }}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                backgroundColor: colors.paleOak,
-                            }}
-                            contentFit="cover"
-                            transition={400}
-                        />
+                        <>
+                            <Image
+                                source={{ uri: imageUrl }}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    backgroundColor: colors.paleOak,
+                                }}
+                                contentFit="cover"
+                                transition={400}
+                                onError={() => {
+                                    console.log('[TripCard] Image failed to load, cleaning up...');
+                                }}
+                            />
+                            {/* Top Contrast Vignette */}
+                            <LinearGradient
+                                colors={['rgba(0,0,0,0.4)', 'transparent']}
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: 100,
+                                }}
+                            />
+                            {/* Bottom Info Gradient */}
+                            <LinearGradient
+                                colors={['transparent', 'rgba(0,0,0,0.85)']}
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: 160,
+                                    justifyContent: 'flex-end',
+                                    paddingHorizontal: 20,
+                                    paddingBottom: 20,
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        fontSize: 12,
+                                        fontWeight: '800',
+                                        color: 'rgba(255, 255, 255, 0.8)',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: 2,
+                                        marginBottom: 4,
+                                    }}
+                                >
+                                    {trip.destination}
+                                </Text>
+                                <Text
+                                    style={{
+                                        fontSize: 26,
+                                        fontWeight: '800',
+                                        color: colors.white,
+                                        letterSpacing: -0.5,
+                                        lineHeight: 32,
+                                    }}
+                                    numberOfLines={2}
+                                >
+                                    {trip.trip_title}
+                                </Text>
+                            </LinearGradient>
+                        </>
                     ) : (
-                        <View
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                backgroundColor: colors.primaryLight,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <Text style={{ fontSize: 60 }}>✈️</Text>
+                        <View style={{ flex: 1 }}>
+                            <LinearGradient
+                                colors={[colors.primaryLight, colors.paleOak]}
+                                style={{
+                                    flex: 1,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    padding: 24,
+                                }}
+                            >
+                                <View style={{
+                                    width: 80,
+                                    height: 80,
+                                    borderRadius: 40,
+                                    backgroundColor: 'rgba(255,255,255,0.7)',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    marginBottom: 16,
+                                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+                                }}>
+                                    <Text style={{ fontSize: 40 }}>🌏</Text>
+                                </View>
+                                <Text
+                                    style={{
+                                        fontSize: 24,
+                                        fontWeight: '800',
+                                        color: colors.regalNavy,
+                                        textAlign: 'center',
+                                        marginBottom: 4,
+                                    }}
+                                >
+                                    {trip.destination}
+                                </Text>
+                                <Text
+                                    style={{
+                                        fontSize: 15,
+                                        fontWeight: '600',
+                                        color: colors.ashBrown,
+                                        textAlign: 'center',
+                                    }}
+                                >
+                                    {trip.trip_title}
+                                </Text>
+                            </LinearGradient>
                         </View>
                     )}
 
-                    {/* Gradient Overlay for Top - only show if there's an image */}
-                    {imageUrl && (
-                        <LinearGradient
-                            colors={['rgba(0,0,0,0.3)', 'transparent']}
-                            style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                height: 80,
-                            }}
-                        />
-                    )}
-
-                    {/* Info Overlay at Bottom */}
-                    {imageUrl ? (
-                        <LinearGradient
-                            colors={['transparent', 'rgba(0,0,0,0.8)']}
-                            style={{
-                                position: 'absolute',
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                height: 120,
-                                justifyContent: 'flex-end',
-                                padding: 20,
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontSize: 13,
-                                    fontWeight: '700',
-                                    color: 'rgba(255, 255, 255, 0.9)',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: 1.5,
-                                    marginBottom: 4,
-                                }}
-                            >
-                                {trip.destination}
-                            </Text>
-                            <Text
-                                style={{
-                                    fontSize: 24,
-                                    fontWeight: '700',
-                                    color: colors.white,
-                                    letterSpacing: -0.5,
-                                }}
-                                numberOfLines={1}
-                            >
-                                {trip.trip_title}
-                            </Text>
-                        </LinearGradient>
-                    ) : (
-                        <View
-                            style={{
-                                position: 'absolute',
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                padding: 20,
-                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                borderTopWidth: 1,
-                                borderTopColor: colors.borderLight,
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontSize: 12,
-                                    fontWeight: '700',
-                                    color: colors.regalNavy,
-                                    textTransform: 'uppercase',
-                                    letterSpacing: 1.2,
-                                    marginBottom: 2,
-                                }}
-                            >
-                                {trip.destination}
-                            </Text>
-                            <Text
-                                style={{
-                                    fontSize: 20,
-                                    fontWeight: '700',
-                                    color: colors.carbonBlack,
-                                    letterSpacing: -0.3,
-                                }}
-                                numberOfLines={1}
-                            >
-                                {trip.trip_title}
-                            </Text>
-                        </View>
-                    )}
-
-                    {/* Days & Activity Badge (Top Right) */}
+                    {/* Top Action UI */}
                     <View
                         style={{
                             position: 'absolute',
                             top: 16,
                             right: 16,
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            paddingHorizontal: 12,
-                            paddingVertical: 6,
-                            borderRadius: 12,
-                            borderCurve: 'continuous',
                             flexDirection: 'row',
                             alignItems: 'center',
-                            gap: 6,
+                            gap: 8,
                         }}
                     >
-                        <Text style={{ fontSize: 13, fontWeight: '600', color: colors.regalNavy }}>
-                            {trip.days.length} Days
-                        </Text>
-                        <View style={{ width: 1, height: 12, backgroundColor: 'rgba(0,0,0,0.1)' }} />
-                        <Text style={{ fontSize: 13, fontWeight: '600', color: colors.regalNavy }}>
-                            {totalActivities} Activities
-                        </Text>
+                        {/* Days & Activity Badge */}
+                        <View
+                            style={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                paddingHorizontal: 12,
+                                paddingVertical: 8,
+                                borderRadius: 12,
+                                borderCurve: 'continuous',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 6,
+                                boxShadow: "0 2px 6px rgba(0,0,0,0.08)"
+                            }}
+                        >
+                            <Text style={{ fontSize: 13, fontWeight: '700', color: colors.regalNavy }}>
+                                {trip.days.length}d
+                            </Text>
+                            <View style={{ width: 1, height: 12, backgroundColor: 'rgba(0,0,0,0.15)' }} />
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: colors.regalNavy }}>
+                                {totalActivities} acts
+                            </Text>
+                        </View>
+
+                        {/* Delete Button */}
+                        <Pressable
+                            onPress={(e) => {
+                                e.stopPropagation();
+                                onLongPress?.();
+                            }}
+                            style={({ pressed }) => ({
+                                width: 36,
+                                height: 36,
+                                borderRadius: 18,
+                                backgroundColor: pressed ? 'rgba(255, 59, 48, 1)' : 'rgba(255, 255, 255, 0.95)',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                            })}
+                        >
+                            <Text style={{ fontSize: 14 }}>{Platform.OS === 'ios' ? '🗑️' : '❌'}</Text>
+                        </Pressable>
                     </View>
 
                     {/* Date Badge (Top Left) */}
@@ -218,14 +245,19 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                                 position: 'absolute',
                                 top: 16,
                                 left: 16,
-                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                backgroundColor: imageUrl ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.9)',
                                 paddingHorizontal: 10,
                                 paddingVertical: 6,
                                 borderRadius: 10,
                                 borderCurve: 'continuous',
+                                boxShadow: "0 2px 6px rgba(0,0,0,0.08)"
                             }}
                         >
-                            <Text style={{ fontSize: 12, fontWeight: '600', color: colors.white }}>
+                            <Text style={{
+                                fontSize: 12,
+                                fontWeight: '700',
+                                color: imageUrl ? colors.white : colors.regalNavy
+                            }}>
                                 {formatDateRange(trip.start_date, trip.days.length)}
                             </Text>
                         </View>

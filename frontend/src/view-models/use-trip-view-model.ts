@@ -169,6 +169,11 @@ export function useTripViewModel(tripId?: string) {
             });
         });
 
+        // Add destination as priority hero image if missing
+        if (!state.itinerary.hero_image_url) {
+            keywords.push(state.itinerary.destination);
+        }
+
         if (keywords.length === 0) return;
 
         try {
@@ -176,6 +181,8 @@ export function useTripViewModel(tripId?: string) {
 
             setState((s) => {
                 if (!s.itinerary) return s;
+
+                const hero_image_url = s.itinerary.hero_image_url || images[s.itinerary.destination];
 
                 const updatedDays = s.itinerary.days.map((day) => ({
                     ...day,
@@ -186,7 +193,18 @@ export function useTripViewModel(tripId?: string) {
                     })),
                 }));
 
-                return { ...s, itinerary: { ...s.itinerary, days: updatedDays } };
+                const updatedItinerary = {
+                    ...s.itinerary,
+                    days: updatedDays,
+                    hero_image_url
+                };
+
+                // Save to local storage
+                storageService.saveItinerary(s.itinerary.id, updatedItinerary).catch((err) => {
+                    console.error('[ViewModel] Failed to save enriched images:', err);
+                });
+
+                return { ...s, itinerary: updatedItinerary };
             });
         } catch (err) {
             console.error("Failed to enrich images:", err);
