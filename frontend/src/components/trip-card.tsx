@@ -54,8 +54,7 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                 backgroundColor: colors.white,
                 overflow: 'hidden',
                 boxShadow: colors.softShadow,
-                borderWidth: 1,
-                borderColor: colors.borderLight,
+
             }}
         >
             <Pressable
@@ -183,93 +182,88 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                         </View>
                     )}
 
-                    {/* Top Action UI */}
+                    {/* Top Badges Row */}
                     <View
                         style={{
                             position: 'absolute',
                             top: 16,
+                            left: 16,
                             right: 16,
                             flexDirection: 'row',
                             alignItems: 'center',
-                            gap: 8,
+                            justifyContent: 'space-between',
                         }}
                     >
-                        {/* Days & Activity Badge */}
-                        <BlurView
-                            intensity={Platform.OS === 'ios' ? 40 : 100}
-                            tint="light"
-                            style={{
-                                backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                                paddingHorizontal: 12,
-                                paddingVertical: 8,
-                                borderRadius: 12,
-                                borderCurve: 'continuous',
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: 6,
-                                borderWidth: 1,
-                                borderColor: 'rgba(255,255,255,0.3)',
-                            }}
-                        >
-                            <Text style={{ fontSize: 13, fontWeight: '800', color: colors.regalNavy }}>
-                                {trip.days.length}d
-                            </Text>
-                            <View style={{ width: 1, height: 12, backgroundColor: 'rgba(0,0,0,0.1)' }} />
-                            <Text style={{ fontSize: 13, fontWeight: '700', color: colors.regalNavy }}>
-                                {totalActivities} acts
-                            </Text>
-                        </BlurView>
+                        {/* Date Badge (Left) */}
+                        {trip.start_date ? (
+                            <BlurView
+                                intensity={Platform.OS === 'ios' ? 40 : 100}
+                                tint={imageUrl ? "dark" : "light"}
+                                style={{
+                                    backgroundColor: imageUrl ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.4)',
+                                    paddingHorizontal: 10,
+                                    paddingVertical: 6,
+                                    borderRadius: 10,
+                                    borderCurve: 'continuous',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                <Text style={{
+                                    fontSize: 12,
+                                    fontWeight: '800',
+                                    color: imageUrl ? colors.white : colors.regalNavy,
+                                    letterSpacing: 0.5,
+                                }}>
+                                    {formatDateRange(trip.start_date, trip.days.length)}
+                                </Text>
+                            </BlurView>
+                        ) : <View />}
 
-                        {/* Delete Button */}
-                        <Pressable
-                            onPress={(e) => {
-                                e.stopPropagation();
-                                onLongPress?.();
-                            }}
-                            style={({ pressed }) => ({
-                                width: 36,
-                                height: 36,
-                                borderRadius: 18,
-                                backgroundColor: pressed ? 'rgba(255, 59, 48, 1)' : 'rgba(255, 255, 255, 0.95)',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-                                borderWidth: 1,
-                                borderColor: 'rgba(255,255,255,0.3)',
-                            })}
-                        >
-                            <Text style={{ fontSize: 14 }}>{Platform.OS === 'ios' ? '🗑️' : '❌'}</Text>
-                        </Pressable>
+                        {/* Days + Delete (Right) */}
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <BlurView
+                                intensity={Platform.OS === 'ios' ? 40 : 100}
+                                tint="light"
+                                style={{
+                                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                                    paddingHorizontal: 12,
+                                    paddingVertical: 6,
+                                    borderRadius: 10,
+                                    borderCurve: 'continuous',
+                                    overflow: 'hidden',
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: 6,
+                                }}
+                            >
+                                <Text style={{ fontSize: 13, fontWeight: '800', color: colors.regalNavy }}>
+                                    {trip.days.length}d
+                                </Text>
+                                <View style={{ width: 1, height: 12, backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                                <Text style={{ fontSize: 13, fontWeight: '700', color: colors.regalNavy }}>
+                                    {totalActivities} acts
+                                </Text>
+                            </BlurView>
+
+                            <Pressable
+                                onPress={(e) => {
+                                    e.stopPropagation();
+                                    onLongPress?.();
+                                }}
+                                style={({ pressed }) => ({
+                                    width: 34,
+                                    height: 34,
+                                    borderRadius: 17,
+                                    backgroundColor: pressed ? 'rgba(255, 59, 48, 1)' : 'rgba(255, 255, 255, 0.95)',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                                })}
+                            >
+                                <Text style={{ fontSize: 14 }}>{Platform.OS === 'ios' ? '🗑️' : '❌'}</Text>
+                            </Pressable>
+                        </View>
                     </View>
-
-                    {/* Date Badge (Top Left) */}
-                    {trip.start_date && (
-                        <BlurView
-                            intensity={Platform.OS === 'ios' ? 40 : 100}
-                            tint={imageUrl ? "dark" : "light"}
-                            style={{
-                                position: 'absolute',
-                                top: 16,
-                                left: 16,
-                                backgroundColor: imageUrl ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.4)',
-                                paddingHorizontal: 10,
-                                paddingVertical: 6,
-                                borderRadius: 10,
-                                borderCurve: 'continuous',
-                                borderWidth: 1,
-                                borderColor: imageUrl ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.3)',
-                            }}
-                        >
-                            <Text style={{
-                                fontSize: 12,
-                                fontWeight: '800',
-                                color: imageUrl ? colors.white : colors.regalNavy,
-                                letterSpacing: 0.5,
-                            }}>
-                                {formatDateRange(trip.start_date, trip.days.length)}
-                            </Text>
-                        </BlurView>
-                    )}
                 </View>
             </Pressable>
         </Animated.View>
