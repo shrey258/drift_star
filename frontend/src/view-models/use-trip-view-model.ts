@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { apiService, Itinerary, Activity } from "../services/api-service";
+import { storageService } from "../services/storage-service";
 
 interface TripViewModelState {
     itinerary: Itinerary | null;
@@ -14,8 +15,9 @@ interface TripViewModelActions {
     selectDay: (dayNumber: number) => void;
     openEditSheet: (activity: Activity) => void;
     closeEditSheet: () => void;
-    updateActivity: (activityId: string, updates: Partial<Activity>) => void;
-    deleteActivity: (activityId: string) => void;
+    updateActivity: (dayNumber: number, activityId: string, updates: Partial<Activity>) => Promise<void>;
+    deleteActivity: (dayNumber: number, activityId: string) => Promise<void>;
+    updateTripMetadata: (updates: Partial<Pick<Itinerary, 'trip_title' | 'start_date' | 'end_date'>>) => Promise<void>;
     enrichImages: () => Promise<void>;
 }
 
@@ -31,13 +33,27 @@ export function useTripViewModel(tripId?: string) {
     const fetchTrip = useCallback(async (id: string) => {
         setState((s) => ({ ...s, isLoading: true, error: null }));
         try {
-            const itinerary = await apiService.getTrip(id);
-            setState((s) => ({
-                ...s,
-                itinerary,
-                isLoading: false,
-                selectedDay: itinerary.days[0]?.day_number || 1,
-            }));
+            // First, check if we have a local edited copy
+            const localCopy = await storageService.getItinerary(id);
+
+            if (localCopy) {
+                console.log('[ViewModel] Using local edited copy');
+                setState((s) => ({
+                    ...s,
+                    itinerary: localCopy,
+                    isLoading: false,
+                    selectedDay: localCopy.days[0]?.day_number || 1,
+                }));
+            } else {
+                // No local copy, fetch from API
+                const itinerary = await apiService.getTrip(id);
+                setState((s) => ({
+                    ...s,
+                    itinerary,
+                    isLoading: false,
+                    selectedDay: itinerary.days[0]?.day_number || 1,
+                }));
+            }
         } catch (err) {
             setState((s) => ({
                 ...s,
@@ -60,7 +76,7 @@ export function useTripViewModel(tripId?: string) {
     }, []);
 
     const updateActivity = useCallback(
-        (activityId: string, updates: Partial<Activity>) => {
+        async (dayNumber: number, activityId: string, updates: Partial<Activity>) => {
             setState((s) => {
                 if (!s.itinerary) return s;
 
@@ -71,9 +87,16 @@ export function useTripViewModel(tripId?: string) {
                     ),
                 }));
 
+                const updatedItinerary = { ...s.itinerary, days: updatedDays };
+
+                // Save to local storage
+                storageService.saveItinerary(s.itinerary.id, updatedItinerary).catch((err) => {
+                    console.error('[ViewModel] Failed to save after update:', err);
+                });
+
                 return {
                     ...s,
-                    itinerary: { ...s.itinerary, days: updatedDays },
+                    itinerary: updatedItinerary,
                     editingActivity: null,
                 };
             });
@@ -81,7 +104,7 @@ export function useTripViewModel(tripId?: string) {
         []
     );
 
-    const deleteActivity = useCallback((activityId: string) => {
+    const deleteActivity = useCallback(async (dayNumber: number, activityId: string) => {
         setState((s) => {
             if (!s.itinerary) return s;
 
@@ -92,13 +115,41 @@ export function useTripViewModel(tripId?: string) {
                 ),
             }));
 
+            const updatedItinerary = { ...s.itinerary, days: updatedDays };
+
+            // Save to local storage
+            storageService.saveItinerary(s.itinerary.id, updatedItinerary).catch((err) => {
+                console.error('[ViewModel] Failed to save after delete:', err);
+            });
+
             return {
                 ...s,
-                itinerary: { ...s.itinerary, days: updatedDays },
+                itinerary: updatedItinerary,
                 editingActivity: null,
             };
         });
     }, []);
+
+    const updateTripMetadata = useCallback(
+        async (updates: Partial<Pick<Itinerary, 'trip_title' | 'start_date' | 'end_date'>>) => {
+            setState((s) => {
+                if (!s.itinerary) return s;
+
+                const updatedItinerary = { ...s.itinerary, ...updates };
+
+                // Save to local storage
+                storageService.saveItinerary(s.itinerary.id, updatedItinerary).catch((err) => {
+                    console.error('[ViewModel] Failed to save metadata:', err);
+                });
+
+                return {
+                    ...s,
+                    itinerary: updatedItinerary,
+                };
+            });
+        },
+        []
+    );
 
     const enrichImages = useCallback(async () => {
         if (!state.itinerary) return;
@@ -162,6 +213,7 @@ export function useTripViewModel(tripId?: string) {
             closeEditSheet,
             updateActivity,
             deleteActivity,
+            updateTripMetadata,
             enrichImages,
         },
     };
