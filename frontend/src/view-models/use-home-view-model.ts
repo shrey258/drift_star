@@ -4,7 +4,8 @@ import { useSharedValue, withSpring } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { CountryService, CountrySuggestion } from "../services/country-service";
-import { apiService } from "../services/api-service";
+import { apiService, Itinerary } from "../services/api-service";
+import { storageService } from "../services/storage-service";
 
 export type FormStep = 0 | 1 | 2;
 
@@ -34,6 +35,10 @@ export const useHomeViewModel = () => {
     const [error, setError] = useState<string | null>(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
+    // Trip history state
+    const [savedTrips, setSavedTrips] = useState<Itinerary[]>([]);
+    const [isLoadingTrips, setIsLoadingTrips] = useState(false);
+
     const inputRef = useRef<TextInput>(null);
     const buttonScale = useSharedValue(1);
 
@@ -58,6 +63,19 @@ export const useHomeViewModel = () => {
         setCountries(results);
         setIsLoading(false);
     };
+
+    const loadSavedTrips = useCallback(async () => {
+        setIsLoadingTrips(true);
+        const trips = await storageService.getAllTrips();
+        setSavedTrips(trips);
+        setIsLoadingTrips(false);
+        console.log('[HomeViewModel] Loaded saved trips:', trips.length);
+    }, []);
+
+    // Load saved trips on mount
+    useEffect(() => {
+        loadSavedTrips();
+    }, [loadSavedTrips]);
 
     const handleInputFocus = useCallback(() => {
         setIsFocused(true);
@@ -130,6 +148,9 @@ export const useHomeViewModel = () => {
 
             // Navigate to trip screen with the generated trip ID
             router.push(`/trip/${itinerary.id}`);
+
+            // Reload saved trips after generating new one
+            await loadSavedTrips();
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to generate itinerary");
             if (process.env.EXPO_OS === "ios") {
@@ -193,6 +214,8 @@ export const useHomeViewModel = () => {
             showDatePicker,
             isCurrentStepValid,
             isLastStep,
+            savedTrips,
+            isLoadingTrips,
         },
         refs: {
             inputRef,
@@ -213,6 +236,7 @@ export const useHomeViewModel = () => {
             goToPreviousStep,
             handleSubmit,
             getStepSummary,
+            loadSavedTrips,
         },
     };
 };

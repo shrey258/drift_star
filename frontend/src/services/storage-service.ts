@@ -74,6 +74,53 @@ export class StorageService {
             return false;
         }
     }
+
+    /**
+     * Get all trip IDs that have been saved.
+     */
+    async getAllTripIds(): Promise<string[]> {
+        try {
+            const allKeys = await AsyncStorage.getAllKeys();
+            const tripKeys = allKeys.filter(key => key.startsWith(STORAGE_PREFIX));
+            const tripIds = tripKeys.map(key => key.replace(STORAGE_PREFIX, ''));
+            console.log('[Storage] Found trip IDs:', tripIds);
+            return tripIds;
+        } catch (error) {
+            console.error('[Storage] Failed to get trip IDs:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Get all saved itineraries.
+     */
+    async getAllTrips(): Promise<Itinerary[]> {
+        try {
+            const tripIds = await this.getAllTripIds();
+            const trips: Itinerary[] = [];
+
+            for (const tripId of tripIds) {
+                const trip = await this.getItinerary(tripId);
+                if (trip) {
+                    trips.push(trip);
+                }
+            }
+
+            // Sort by most recent first
+            trips.sort((a, b) => {
+                if (a.start_date && b.start_date) {
+                    return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+                }
+                return 0;
+            });
+
+            console.log('[Storage] Loaded all trips:', trips.length);
+            return trips;
+        } catch (error) {
+            console.error('[Storage] Failed to get all trips:', error);
+            return [];
+        }
+    }
 }
 
 // Default singleton instance
