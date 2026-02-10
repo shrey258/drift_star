@@ -59,53 +59,86 @@ export default function HomeScreen() {
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          paddingTop: insets.top + 32,
+          paddingTop: insets.top + 20,
           paddingBottom: insets.bottom + 24,
           paddingHorizontal: 24,
         }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        {/* Decorative Background Accent */}
+        <View
+          style={{
+            position: 'absolute',
+            top: -100,
+            right: -100,
+            width: 300,
+            height: 300,
+            borderRadius: 150,
+            backgroundColor: colors.primaryLight,
+            opacity: 0.5,
+            filter: 'blur(60px)',
+            zIndex: -1
+          }}
+        />
+
         {/* Hero Section */}
         <Animated.View
-          entering={FadeInDown.duration(400).delay(50)}
-          style={{ marginBottom: 28 }}
+          entering={FadeInDown.duration(600).delay(100).springify().damping(20)}
+          style={{ marginBottom: 32 }}
         >
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-            <Text
-              style={{
-                fontSize: 12,
-                fontWeight: "700",
-                color: colors.burntPeach,
-                letterSpacing: 1.5,
-                textTransform: "uppercase",
-              }}
-            >
-              Drift Star
-            </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <View style={{ width: 32, height: 32, backgroundColor: colors.regalNavy, borderRadius: 8, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: colors.white, fontSize: 18, fontWeight: '800' }}>★</Text>
+              </View>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "800",
+                  color: colors.carbonBlack,
+                  letterSpacing: 1,
+                  textTransform: "uppercase",
+                }}
+              >
+                Drift Star
+              </Text>
+            </View>
+
             {state.savedTrips.length > 0 && (
               <Pressable
                 onPress={() => router.push('/trips')}
                 style={({ pressed }) => ({
-                  opacity: pressed ? 0.6 : 1,
+                  backgroundColor: colors.white,
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: colors.borderLight,
+                  boxShadow: pressed ? "none" : "0 2px 4px rgba(0,0,0,0.05)",
+                  transform: [{ scale: pressed ? 0.98 : 1 }],
                 })}
               >
-                <Text style={{ fontSize: 15, fontWeight: '600', color: colors.primary }}>
-                  My Trips →
+                <Text style={{ fontSize: 13, fontWeight: '700', color: colors.regalNavy }}>
+                  My Trips
                 </Text>
               </Pressable>
             )}
           </View>
+
           <Text
             style={{
-              fontSize: 32,
-              fontWeight: "700",
+              fontSize: 38,
+              fontWeight: "800",
               color: colors.carbonBlack,
-              lineHeight: 40,
-              letterSpacing: -0.5,
+              lineHeight: 44,
+              letterSpacing: -1,
             }}
           >
-            Plan your adventure
+            Where to next?
+          </Text>
+          <Text style={{ fontSize: 16, color: colors.ashBrown, marginTop: 8, fontWeight: '500' }}>
+            Plan your next journey with AI intelligence.
           </Text>
         </Animated.View>
 

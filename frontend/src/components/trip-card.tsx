@@ -7,6 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { Platform } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from "expo-blur";
 
 interface TripCardProps {
     trip: Itinerary;
@@ -52,11 +53,9 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                 borderRadius: 24,
                 backgroundColor: colors.white,
                 overflow: 'hidden',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.12,
-                shadowRadius: 16,
-                elevation: 4,
+                boxShadow: colors.softShadow,
+                borderWidth: 1,
+                borderColor: colors.borderLight,
             }}
         >
             <Pressable
@@ -196,9 +195,11 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                         }}
                     >
                         {/* Days & Activity Badge */}
-                        <View
+                        <BlurView
+                            intensity={Platform.OS === 'ios' ? 40 : 100}
+                            tint="light"
                             style={{
-                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                backgroundColor: 'rgba(255, 255, 255, 0.4)',
                                 paddingHorizontal: 12,
                                 paddingVertical: 8,
                                 borderRadius: 12,
@@ -206,17 +207,18 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 gap: 6,
-                                boxShadow: "0 2px 6px rgba(0,0,0,0.08)"
+                                borderWidth: 1,
+                                borderColor: 'rgba(255,255,255,0.3)',
                             }}
                         >
-                            <Text style={{ fontSize: 13, fontWeight: '700', color: colors.regalNavy }}>
+                            <Text style={{ fontSize: 13, fontWeight: '800', color: colors.regalNavy }}>
                                 {trip.days.length}d
                             </Text>
-                            <View style={{ width: 1, height: 12, backgroundColor: 'rgba(0,0,0,0.15)' }} />
-                            <Text style={{ fontSize: 13, fontWeight: '600', color: colors.regalNavy }}>
+                            <View style={{ width: 1, height: 12, backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                            <Text style={{ fontSize: 13, fontWeight: '700', color: colors.regalNavy }}>
                                 {totalActivities} acts
                             </Text>
-                        </View>
+                        </BlurView>
 
                         {/* Delete Button */}
                         <Pressable
@@ -232,6 +234,8 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                                borderWidth: 1,
+                                borderColor: 'rgba(255,255,255,0.3)',
                             })}
                         >
                             <Text style={{ fontSize: 14 }}>{Platform.OS === 'ios' ? '🗑️' : '❌'}</Text>
@@ -240,27 +244,31 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
 
                     {/* Date Badge (Top Left) */}
                     {trip.start_date && (
-                        <View
+                        <BlurView
+                            intensity={Platform.OS === 'ios' ? 40 : 100}
+                            tint={imageUrl ? "dark" : "light"}
                             style={{
                                 position: 'absolute',
                                 top: 16,
                                 left: 16,
-                                backgroundColor: imageUrl ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.9)',
+                                backgroundColor: imageUrl ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.4)',
                                 paddingHorizontal: 10,
                                 paddingVertical: 6,
                                 borderRadius: 10,
                                 borderCurve: 'continuous',
-                                boxShadow: "0 2px 6px rgba(0,0,0,0.08)"
+                                borderWidth: 1,
+                                borderColor: imageUrl ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.3)',
                             }}
                         >
                             <Text style={{
                                 fontSize: 12,
-                                fontWeight: '700',
-                                color: imageUrl ? colors.white : colors.regalNavy
+                                fontWeight: '800',
+                                color: imageUrl ? colors.white : colors.regalNavy,
+                                letterSpacing: 0.5,
                             }}>
                                 {formatDateRange(trip.start_date, trip.days.length)}
                             </Text>
-                        </View>
+                        </BlurView>
                     )}
                 </View>
             </Pressable>

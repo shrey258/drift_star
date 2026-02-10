@@ -242,16 +242,17 @@ export function DaysStep({
 
 const styles = StyleSheet.create({
     title: {
-        fontSize: 12,
-        fontWeight: "700",
-        color: colors.burntPeach,
-        letterSpacing: 1,
+        fontSize: 13,
+        fontWeight: "800",
+        color: colors.regalNavy,
+        letterSpacing: 1.5,
         textTransform: "uppercase",
+        opacity: 0.8,
     },
     buttonText: {
         fontSize: 28,
         fontWeight: "500",
-        color: colors.carbonBlack,
+        color: colors.regalNavy,
         marginTop: -2,
     }
 });

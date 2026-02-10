@@ -5,6 +5,7 @@ import { Image } from "expo-image";
 import { colors } from "../constants/colors";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from "expo-blur";
 
 interface Activity {
     id: string;
@@ -81,15 +82,15 @@ export function ActivityCard({ activity, index, onEdit, onDelete, onAddToCalenda
                 }}
                 style={({ pressed }) => ({
                     backgroundColor: colors.white,
-                    borderRadius: 16,
+                    borderRadius: 20,
                     borderCurve: "continuous",
                     overflow: "hidden",
                     borderWidth: 1,
-                    borderColor: pressed ? 'rgba(0, 0, 0, 0.12)' : colors.borderLight,
+                    borderColor: pressed ? 'rgba(0, 0, 0, 0.1)' : colors.borderLight,
                     boxShadow: pressed
-                        ? "0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04)"
-                        : "0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)",
-                    transform: [{ scale: pressed ? 0.97 : 1 }],
+                        ? "0 4px 12px rgba(0, 0, 0, 0.08)"
+                        : colors.softShadow,
+                    transform: [{ scale: pressed ? 0.985 : 1 }],
                 })}
             >
                 {/* Image */}
@@ -97,44 +98,65 @@ export function ActivityCard({ activity, index, onEdit, onDelete, onAddToCalenda
                     <View style={{ position: "relative", overflow: 'hidden' }}>
                         <Image
                             source={{ uri: activity.image_url }}
-                            style={{ width: "100%", height: 180 }}
+                            style={{ width: "100%", height: 200, backgroundColor: colors.paleOak }}
                             contentFit="cover"
                             transition={300}
                         />
                         {/* Smooth gradient overlay for better text contrast */}
                         <LinearGradient
-                            colors={['transparent', 'rgba(0,0,0,0.2)']}
+                            colors={['transparent', 'rgba(0,0,0,0.3)']}
                             style={{
                                 position: "absolute",
                                 bottom: 0,
                                 left: 0,
                                 right: 0,
-                                height: 60,
+                                height: 80,
                             }}
                             pointerEvents="none"
                         />
+
+                        {/* Glassmorphic Time Badge over Image */}
+                        <BlurView
+                            intensity={Platform.OS === 'ios' ? 40 : 100}
+                            tint="light"
+                            style={{
+                                position: 'absolute',
+                                top: 12,
+                                left: 12,
+                                borderRadius: 8,
+                                overflow: 'hidden',
+                                borderWidth: 1,
+                                borderColor: 'rgba(255,255,255,0.3)',
+                            }}
+                        >
+                            <View style={{ paddingHorizontal: 10, paddingVertical: 5, backgroundColor: 'rgba(255,255,255,0.4)' }}>
+                                <Text
+                                    style={{
+                                        fontSize: 11,
+                                        fontWeight: "800",
+                                        color: colors.regalNavy,
+                                        letterSpacing: 0.5,
+                                    }}
+                                >
+                                    {formatTime(activity.start_time)}
+                                </Text>
+                            </View>
+                        </BlurView>
                     </View>
                 )}
 
                 {/* Content */}
-                <View style={{ padding: 18 }}>
-                    {/* Time & Duration Row */}
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            marginBottom: 12,
-                            gap: 10,
-                        }}
-                    >
+                <View style={{ padding: 20 }}>
+                    {!activity.image_url && (
                         <View
                             style={{
                                 backgroundColor: colors.primaryLight,
-                                borderRadius: 7,
+                                alignSelf: 'flex-start',
+                                borderRadius: 8,
                                 borderCurve: "continuous",
                                 paddingHorizontal: 10,
                                 paddingVertical: 5,
-                                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.08)",
+                                marginBottom: 12,
                             }}
                         >
                             <Text
@@ -142,34 +164,22 @@ export function ActivityCard({ activity, index, onEdit, onDelete, onAddToCalenda
                                     fontSize: 11,
                                     fontWeight: "800",
                                     color: colors.regalNavy,
-                                    letterSpacing: 0.3,
+                                    letterSpacing: 0.5,
                                 }}
                             >
                                 {formatTime(activity.start_time)}
                             </Text>
                         </View>
-                        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                            <Text style={{ fontSize: 12, color: colors.ashBrown }}>⏱</Text>
-                            <Text
-                                style={{
-                                    fontSize: 12,
-                                    fontWeight: "600",
-                                    color: colors.ashBrown,
-                                }}
-                            >
-                                {formatDuration(activity.duration_minutes)}
-                            </Text>
-                        </View>
-                    </View>
+                    )}
 
                     {/* Name */}
                     <Text
                         style={{
-                            fontSize: 18,
-                            fontWeight: "700",
+                            fontSize: 20,
+                            fontWeight: "800",
                             color: colors.carbonBlack,
                             marginBottom: 8,
-                            letterSpacing: -0.3,
+                            letterSpacing: -0.5,
                         }}
                         numberOfLines={2}
                     >
@@ -179,30 +189,45 @@ export function ActivityCard({ activity, index, onEdit, onDelete, onAddToCalenda
                     {/* Description */}
                     <Text
                         style={{
-                            fontSize: 14,
+                            fontSize: 15,
                             color: colors.ashBrown,
-                            lineHeight: 21,
-                            marginBottom: 12,
+                            lineHeight: 22,
+                            marginBottom: 16,
                             fontWeight: "400",
                         }}
-                        numberOfLines={2}
+                        numberOfLines={3}
                     >
                         {activity.description}
                     </Text>
 
-                    {/* Location */}
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                        <Text style={{ fontSize: 14 }}>📍</Text>
-                        <Text
-                            style={{
-                                fontSize: 13,
-                                fontWeight: "600",
-                                color: colors.carbonBlack,
-                            }}
-                            numberOfLines={1}
-                        >
-                            {activity.location_name}
-                        </Text>
+                    {/* Footer: Location & Duration */}
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: 'space-between' }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flex: 1 }}>
+                            <Text style={{ fontSize: 14 }}>📍</Text>
+                            <Text
+                                style={{
+                                    fontSize: 13,
+                                    fontWeight: "600",
+                                    color: colors.carbonBlack,
+                                }}
+                                numberOfLines={1}
+                            >
+                                {activity.location_name}
+                            </Text>
+                        </View>
+
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                            <Text style={{ fontSize: 12, opacity: 0.6 }}>⏱</Text>
+                            <Text
+                                style={{
+                                    fontSize: 12,
+                                    fontWeight: "700",
+                                    color: colors.ashBrown,
+                                }}
+                            >
+                                {formatDuration(activity.duration_minutes)}
+                            </Text>
+                        </View>
                     </View>
                 </View>
             </Pressable>

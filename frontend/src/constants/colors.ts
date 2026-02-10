@@ -29,6 +29,12 @@ export const colors = {
     primaryLight: "rgba(16, 57, 132, 0.1)",
     accent: "#D57A5C",
     accentStrong: "#BE2A0B",
+
+    // Premium UI Tokens
+    glassBackground: "rgba(255, 255, 255, 0.8)",
+    glassBorder: "rgba(255, 255, 255, 0.3)",
+    deepShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+    softShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
 } as const;
 
 export type ColorKey = keyof typeof colors;

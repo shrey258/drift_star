@@ -1,4 +1,5 @@
-import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Platform, Alert } from "react-native";
+import { BlurView } from "expo-blur";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
@@ -9,7 +10,6 @@ import { calendarService } from '../src/services/calendar-service';
 import { Itinerary } from '../src/services/api-service';
 import { TripCard } from '../src/components/trip-card';
 import * as Haptics from 'expo-haptics';
-import { Platform, Alert } from 'react-native';
 
 export default function TripsScreen() {
     const insets = useSafeAreaInsets();
@@ -71,14 +71,17 @@ export default function TripsScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: colors.background }}>
             {/* Header */}
-            <View
+            <BlurView
+                intensity={Platform.OS === 'ios' ? 90 : 0}
+                tint="light"
                 style={{
-                    paddingTop: insets.top + 16,
+                    paddingTop: insets.top + 8,
                     paddingBottom: 16,
                     paddingHorizontal: 24,
                     borderBottomWidth: 1,
-                    borderBottomColor: colors.borderLight,
-                    backgroundColor: colors.white,
+                    borderBottomColor: 'rgba(0,0,0,0.06)',
+                    backgroundColor: Platform.OS === 'ios' ? 'rgba(255,255,255,0.8)' : colors.white,
+                    zIndex: 10,
                 }}
             >
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -90,17 +93,24 @@ export default function TripsScreen() {
                             router.back();
                         }}
                         style={({ pressed }) => ({
-                            opacity: pressed ? 0.6 : 1,
+                            backgroundColor: colors.white,
+                            paddingHorizontal: 12,
+                            paddingVertical: 8,
+                            borderRadius: 20,
+                            borderWidth: 1,
+                            borderColor: colors.borderLight,
+                            opacity: pressed ? 0.7 : 1,
+                            boxShadow: pressed ? "none" : "0 2px 4px rgba(0,0,0,0.05)",
                         })}
                     >
-                        <Text style={{ fontSize: 17, color: colors.primary }}>← Back</Text>
+                        <Text style={{ fontSize: 13, fontWeight: '700', color: colors.regalNavy }}>← Home</Text>
                     </Pressable>
-                    <Text style={{ fontSize: 20, fontWeight: '700', color: colors.text }}>
+                    <Text style={{ fontSize: 18, fontWeight: '800', color: colors.carbonBlack, letterSpacing: -0.5 }}>
                         My Trips
                     </Text>
                     <View style={{ width: 60 }} />
                 </View>
-            </View>
+            </BlurView>
 
             {/* Content */}
             <ScrollView
