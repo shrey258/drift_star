@@ -2,7 +2,7 @@
  * API service for Drift Star backend.
  */
 
-const API_BASE_URL = "https://63a9-117-195-163-229.ngrok-free.app";
+const API_BASE_URL = "https://drift-star-backend.fly.dev";
 
 export interface GenerateItineraryRequest {
     destination: string;
