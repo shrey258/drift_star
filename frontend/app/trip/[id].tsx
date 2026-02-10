@@ -10,6 +10,8 @@ import { Day, Activity } from "../../src/services/api-service";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { EditActivitySheet } from "../../src/components/edit-activity-sheet";
+import { calendarService } from "../../src/services/calendar-service";
+import { CalendarPreviewModal } from "../../src/components/calendar-preview-modal";
 
 export default function TripScreen() {
     const insets = useSafeAreaInsets();
@@ -19,6 +21,7 @@ export default function TripScreen() {
     const { state, actions } = useTripViewModel(id);
     const scrollY = useSharedValue(0);
     const [editingActivity, setEditingActivity] = useState<{ activity: Activity; dayNumber: number } | null>(null);
+    const [showCalendarPreview, setShowCalendarPreview] = useState(false);
 
     // Enrich images once trip is loaded
     useEffect(() => {
@@ -245,118 +248,175 @@ export default function TripScreen() {
                                     ]
                                 );
                             }}
+                            onAddToCalendar={async () => {
+                                if (Platform.OS === 'ios') {
+                                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                }
+                                if (state.itinerary?.start_date) {
+                                    await calendarService.addActivityToCalendar(
+                                        item,
+                                        state.itinerary.start_date,
+                                        section.day.day_number
+                                    );
+                                } else {
+                                    Alert.alert('Error', 'Trip start date is missing.');
+                                }
+                            }}
                         />
                     </Animated.View>
                 )}
                 // Page Header (Trip Info)
                 ListHeaderComponent={
-                    <View
-                        style={{
-                            paddingTop: insets.top + 16,
-                            paddingHorizontal: 24,
-                            paddingBottom: 8,
-                            backgroundColor: colors.background,
-                        }}
-                    >
-                        {/* Back Button */}
-                        <Pressable
-                            onPress={() => {
-                                if (Platform.OS === 'ios') {
-                                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                                }
-                                router.back();
-                            }}
-                            style={({ pressed }) => ({
+                    <View>
+                        {/* Header with Back + Export Buttons */}
+                        <View
+                            style={{
                                 flexDirection: "row",
                                 alignItems: "center",
-                                marginBottom: 20,
-                                alignSelf: 'flex-start',
-                                paddingVertical: 4,
-                                paddingHorizontal: 4,
-                                transform: [{ scale: pressed ? 0.95 : 1 }],
-                            })}
+                                justifyContent: "space-between",
+                                paddingHorizontal: 24,
+                                paddingTop: 16 + insets.top,
+                                paddingBottom: 16,
+                            }}
                         >
-                            <Text style={{ fontSize: 15, color: colors.ashBrown, fontWeight: "500" }}>← Back</Text>
-                        </Pressable>
+                            {/* Back Button */}
+                            <Pressable
+                                onPress={() => {
+                                    if (Platform.OS === 'ios') {
+                                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                    }
+                                    router.back();
+                                }}
+                                style={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: 20,
+                                    backgroundColor: "rgba(255, 255, 255, 0.9)",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                                }}
+                            >
+                                <Text style={{ fontSize: 20, color: colors.regalNavy }}>←</Text>
+                            </Pressable>
+
+                            {/* Export to Calendar Button */}
+                            <Pressable
+                                onPress={() => {
+                                    if (Platform.OS === 'ios') {
+                                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                                    }
+                                    setShowCalendarPreview(true);
+                                }}
+                                style={({ pressed }) => ({
+                                    paddingHorizontal: 16,
+                                    paddingVertical: 10,
+                                    borderRadius: 20,
+                                    backgroundColor: pressed ? colors.regalNavy : "rgba(255, 255, 255, 0.9)",
+                                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    gap: 6,
+                                })}
+                            >
+                                <Text style={{ fontSize: 18 }}>📅</Text>
+                                <Text
+                                    style={{
+                                        fontSize: 15,
+                                        fontWeight: "600",
+                                        color: colors.regalNavy,
+                                    }}
+                                >
+                                    Export
+                                </Text>
+                            </Pressable>
+                        </View>
 
                         {/* Trip Title & Metadata */}
                         <Animated.View entering={FadeInDown.duration(500).delay(100)}>
                             <View
                                 style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    marginBottom: 10,
-                                    gap: 10,
+                                    paddingHorizontal: 24,
+                                    paddingBottom: 8,
                                 }}
                             >
                                 <View
                                     style={{
-                                        backgroundColor: colors.primaryLight,
-                                        borderRadius: 8,
-                                        borderCurve: "continuous",
-                                        paddingHorizontal: 12,
-                                        paddingVertical: 5,
-                                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.08)",
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                        marginBottom: 10,
+                                        gap: 10,
                                     }}
                                 >
-                                    <Text
+                                    <View
                                         style={{
-                                            fontSize: 12,
-                                            fontWeight: "800",
-                                            color: colors.regalNavy,
-                                            textTransform: "uppercase",
-                                            letterSpacing: 0.5,
+                                            backgroundColor: colors.primaryLight,
+                                            borderRadius: 8,
+                                            borderCurve: "continuous",
+                                            paddingHorizontal: 12,
+                                            paddingVertical: 5,
+                                            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.08)",
                                         }}
                                     >
-                                        📍 {itinerary.destination}
-                                    </Text>
+                                        <Text
+                                            style={{
+                                                fontSize: 12,
+                                                fontWeight: "800",
+                                                color: colors.regalNavy,
+                                                textTransform: "uppercase",
+                                                letterSpacing: 0.5,
+                                            }}
+                                        >
+                                            📍 {itinerary.destination}
+                                        </Text>
+                                    </View>
+                                    {formatDateRange() && (
+                                        <Text
+                                            style={{
+                                                fontSize: 13,
+                                                color: colors.ashBrown,
+                                                fontWeight: "500",
+                                            }}
+                                        >
+                                            {formatDateRange()}
+                                        </Text>
+                                    )}
                                 </View>
-                                {formatDateRange() && (
+
+                                <Text
+                                    style={{
+                                        fontSize: 32,
+                                        fontWeight: "800",
+                                        color: colors.carbonBlack,
+                                        lineHeight: 40,
+                                        letterSpacing: -0.5,
+                                        marginBottom: 4,
+                                    }}
+                                >
+                                    {itinerary.trip_title}
+                                </Text>
+
+                                <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 8 }}>
                                     <Text
                                         style={{
-                                            fontSize: 13,
+                                            fontSize: 14,
                                             color: colors.ashBrown,
                                             fontWeight: "500",
                                         }}
                                     >
-                                        {formatDateRange()}
+                                        {itinerary.days.length} days
                                     </Text>
-                                )}
-                            </View>
-
-                            <Text
-                                style={{
-                                    fontSize: 32,
-                                    fontWeight: "800",
-                                    color: colors.carbonBlack,
-                                    lineHeight: 40,
-                                    letterSpacing: -0.5,
-                                    marginBottom: 4,
-                                }}
-                            >
-                                {itinerary.trip_title}
-                            </Text>
-
-                            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 8 }}>
-                                <Text
-                                    style={{
-                                        fontSize: 14,
-                                        color: colors.ashBrown,
-                                        fontWeight: "500",
-                                    }}
-                                >
-                                    {itinerary.days.length} days
-                                </Text>
-                                <Text style={{ fontSize: 14, color: colors.ashBrown }}>•</Text>
-                                <Text
-                                    style={{
-                                        fontSize: 14,
-                                        color: colors.ashBrown,
-                                        fontWeight: "500",
-                                    }}
-                                >
-                                    {itinerary.days.reduce((acc, day) => acc + day.activities.length, 0)} activities
-                                </Text>
+                                    <Text style={{ fontSize: 14, color: colors.ashBrown }}>•</Text>
+                                    <Text
+                                        style={{
+                                            fontSize: 14,
+                                            color: colors.ashBrown,
+                                            fontWeight: "500",
+                                        }}
+                                    >
+                                        {itinerary.days.reduce((acc, day) => acc + day.activities.length, 0)} activities
+                                    </Text>
+                                </View>
                             </View>
                         </Animated.View>
                     </View>
@@ -387,6 +447,19 @@ export default function TripScreen() {
                     />
                 )}
             </Modal>
-        </View>
+
+            {/* Calendar Preview Modal */}
+            <CalendarPreviewModal
+                visible={showCalendarPreview}
+                itinerary={state.itinerary}
+                onConfirm={async () => {
+                    setShowCalendarPreview(false);
+                    if (state.itinerary) {
+                        await calendarService.exportAllActivities(state.itinerary);
+                    }
+                }}
+                onCancel={() => setShowCalendarPreview(false)}
+            />
+        </View >
     );
 }

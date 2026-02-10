@@ -20,6 +20,7 @@ interface ActivityCardProps {
     index: number;
     onEdit?: () => void;
     onDelete?: () => void;
+    onAddToCalendar?: () => void;
 }
 
 function formatTime(time: string): string {
@@ -37,7 +38,7 @@ function formatDuration(minutes: number): string {
     return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
 }
 
-export function ActivityCard({ activity, index, onEdit, onDelete }: ActivityCardProps) {
+export function ActivityCard({ activity, index, onEdit, onDelete, onAddToCalendar }: ActivityCardProps) {
     return (
         <Animated.View entering={FadeIn.duration(300).delay(index * 60)}>
             <Pressable
@@ -58,14 +59,16 @@ export function ActivityCard({ activity, index, onEdit, onDelete }: ActivityCard
                         const ActionSheetIOS = require('react-native').ActionSheetIOS;
                         ActionSheetIOS.showActionSheetWithOptions(
                             {
-                                options: ['Cancel', 'Edit', 'Delete'],
-                                destructiveButtonIndex: 2,
+                                options: ['Cancel', 'Edit', 'Add to Calendar', 'Delete'],
+                                destructiveButtonIndex: 3,
                                 cancelButtonIndex: 0,
                             },
                             (buttonIndex: number) => {
                                 if (buttonIndex === 1) {
                                     onEdit?.();
                                 } else if (buttonIndex === 2) {
+                                    onAddToCalendar?.();
+                                } else if (buttonIndex === 3) {
                                     onDelete?.();
                                 }
                             }
