@@ -19,7 +19,7 @@ export const MOCK_TOKYO_ITINERARY: Itinerary = {
                     duration_minutes: 90,
                     location_name: "Asakusa",
                     image_keyword: "sensoji temple",
-                    image_url: "https://images.pexels.com/photos/161401/senso-ji-temple-tokyo-japan-temple-161401.jpeg",
+                    image_url: "https://images.pexels.com/photos/1496192/pexels-photo-1496192.jpeg",
                 },
                 {
                     id: "act-1-2",
@@ -39,7 +39,7 @@ export const MOCK_TOKYO_ITINERARY: Itinerary = {
                     duration_minutes: 120,
                     location_name: "Toyosu",
                     image_keyword: "teamlab borderless",
-                    image_url: "https://images.pexels.com/photos/3171837/pexels-photo-3171837.jpeg",
+                    image_url: "https://images.pexels.com/photos/4053610/pexels-photo-4053610.jpeg",
                 },
                 {
                     id: "act-1-4",
@@ -49,7 +49,7 @@ export const MOCK_TOKYO_ITINERARY: Itinerary = {
                     duration_minutes: 60,
                     location_name: "Shibuya",
                     image_keyword: "shibuya crossing",
-                    image_url: "https://images.pexels.com/photos/2385210/pexels-photo-2385210.jpeg",
+                    image_url: "https://images.pexels.com/photos/6859240/pexels-photo-6859240.jpeg",
                 },
             ],
         },

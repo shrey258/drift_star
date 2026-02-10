@@ -53,6 +53,11 @@ export function useTripViewModel(tripId?: string) {
                     isLoading: false,
                     selectedDay: itinerary.days[0]?.day_number || 1,
                 }));
+
+                // Auto-save to local storage so it appears in "My Trips"
+                storageService.saveItinerary(id, itinerary).catch(err => {
+                    console.error('[ViewModel] Failed to auto-save API trip:', err);
+                });
             }
         } catch (err) {
             setState((s) => ({

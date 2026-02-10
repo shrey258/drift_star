@@ -146,6 +146,9 @@ export const useHomeViewModel = () => {
                 travelDate
             );
 
+            // Save to local storage so it appears in "My Trips"
+            await storageService.saveItinerary(itinerary.id, itinerary);
+
             // Navigate to trip screen with the generated trip ID
             router.push(`/trip/${itinerary.id}`);
 
