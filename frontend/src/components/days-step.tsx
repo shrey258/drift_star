@@ -98,7 +98,7 @@ export function DaysStep({
             color: interpolateColor(
                 completionProgress.value,
                 [0, 1],
-                [colors.regalNavy, colors.carbonBlack]
+                [colors.coral, colors.carbonBlack]
             ),
             lineHeight: interpolate(completionProgress.value, [0, 1], [64, 32]),
         };
@@ -158,7 +158,7 @@ export function DaysStep({
                             {
                                 height: 6,
                                 borderRadius: 3,
-                                backgroundColor: colors.regalNavy,
+                                backgroundColor: colors.coral,
                             },
                             dotStyle
                         ]}
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 13,
         fontWeight: "800",
-        color: colors.regalNavy,
+        color: colors.coral,
         letterSpacing: 1.5,
         textTransform: "uppercase",
         opacity: 0.8,
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 28,
         fontWeight: "500",
-        color: colors.regalNavy,
+        color: colors.coral,
         marginTop: -2,
     }
 });

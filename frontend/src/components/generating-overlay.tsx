@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
         height: 130,
         borderRadius: 65,
         borderWidth: 1.5,
-        borderColor: colors.regalNavy,
+        borderColor: colors.coral,
         borderStyle: "dashed",
         opacity: 0.2,
     },
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
         width: 10,
         height: 10,
         borderRadius: 5,
-        backgroundColor: colors.regalNavy,
+        backgroundColor: colors.coral,
         boxShadow: "0 0 10px rgba(16, 57, 132, 0.5)",
     },
     destination: {
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
         width: 10,
         height: 10,
         borderRadius: 5,
-        backgroundColor: colors.regalNavy,
+        backgroundColor: colors.coral,
         opacity: 0.8,
     },
 });

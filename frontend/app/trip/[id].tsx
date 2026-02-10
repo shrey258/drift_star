@@ -44,7 +44,7 @@ export default function TripScreen() {
                 }}
             >
                 <Animated.View entering={FadeIn.duration(400)}>
-                    <ActivityIndicator size="large" color={colors.regalNavy} />
+                    <ActivityIndicator size="large" color={colors.coral} />
                     <Text style={{ marginTop: 16, color: colors.ashBrown, fontSize: 15, fontWeight: "500" }}>
                         Loading your trip...
                     </Text>
@@ -103,7 +103,7 @@ export default function TripScreen() {
                             router.back();
                         }}
                         style={({ pressed }) => ({
-                            backgroundColor: colors.regalNavy,
+                            backgroundColor: colors.coral,
                             paddingHorizontal: 24,
                             paddingVertical: 14,
                             borderRadius: 12,
@@ -220,7 +220,7 @@ export default function TripScreen() {
                                         opacity: pressed ? 0.7 : 1,
                                     })}
                                 >
-                                    <Text style={{ fontSize: 20, color: colors.regalNavy }}>←</Text>
+                                    <Text style={{ fontSize: 20, color: colors.coral }}>←</Text>
                                 </Pressable>
                             </View>
                         )}
@@ -243,7 +243,7 @@ export default function TripScreen() {
                                             style={{
                                                 fontSize: 12,
                                                 fontWeight: "700",
-                                                color: colors.regalNavy,
+                                                color: colors.coral,
                                                 letterSpacing: 0.3,
                                             }}
                                         >
@@ -252,7 +252,7 @@ export default function TripScreen() {
                                     </View>
                                     <View
                                         style={{
-                                            backgroundColor: 'rgba(213, 122, 92, 0.12)',
+                                            backgroundColor: colors.accentLight,
                                             borderRadius: 8,
                                             borderCurve: "continuous",
                                             paddingHorizontal: 10,
@@ -263,7 +263,7 @@ export default function TripScreen() {
                                             style={{
                                                 fontSize: 12,
                                                 fontWeight: "700",
-                                                color: colors.burntPeach,
+                                                color: colors.coral,
                                                 letterSpacing: 0.3,
                                             }}
                                         >
@@ -273,7 +273,7 @@ export default function TripScreen() {
                                     {formatDateRange() && (
                                         <View
                                             style={{
-                                                backgroundColor: 'rgba(108, 134, 187, 0.12)',
+                                                backgroundColor: colors.glaucousLight,
                                                 borderRadius: 8,
                                                 borderCurve: "continuous",
                                                 paddingHorizontal: 10,
@@ -336,7 +336,7 @@ export default function TripScreen() {
                                         style={{
                                             fontSize: 13,
                                             fontWeight: "600",
-                                            color: colors.regalNavy,
+                                            color: colors.coral,
                                         }}
                                     >
                                         Export to Calendar
@@ -358,13 +358,13 @@ export default function TripScreen() {
                             paddingHorizontal: 24,
                             backgroundColor: Platform.OS === 'ios' ? 'rgba(255,255,255,0.92)' : colors.background,
                             borderBottomWidth: 1,
-                            borderBottomColor: 'rgba(0,0,0,0.06)',
+                            borderBottomColor: colors.borderSubtle,
                         }}
                     >
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                             <View
                                 style={{
-                                    backgroundColor: colors.regalNavy,
+                                    backgroundColor: colors.coral,
                                     borderRadius: 7,
                                     borderCurve: "continuous",
                                     paddingHorizontal: 9,

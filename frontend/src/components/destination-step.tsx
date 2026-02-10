@@ -69,7 +69,7 @@ export function DestinationStep({
             completionProgress.value,
             [0, 1],
             [
-                isActive ? colors.regalNavy : colors.borderLight, // Active border
+                isActive ? colors.coral : colors.borderLight, // Active border
                 colors.borderLight, // Completed border
             ]
         );
@@ -148,7 +148,7 @@ export function DestinationStep({
                                 {
                                     height: 6,
                                     borderRadius: 3,
-                                    backgroundColor: colors.regalNavy,
+                                    backgroundColor: colors.coral,
                                 },
                                 dotStyle,
                             ]}
@@ -190,7 +190,7 @@ export function DestinationStep({
                         {isLoading && !isCompleted && (
                             <ActivityIndicator
                                 size="small"
-                                color={colors.regalNavy}
+                                color={colors.coral}
                                 style={{ marginLeft: 10 }}
                             />
                         )}
@@ -210,7 +210,7 @@ export function DestinationStep({
                                 borderRadius: 12,
                                 borderWidth: 1,
                                 borderColor: colors.borderLight,
-                                boxShadow: "0 8px 24px rgba(27, 27, 27, 0.12)",
+                                boxShadow: colors.deepShadow,
                                 overflow: "hidden",
                             }}
                         >
@@ -262,7 +262,7 @@ export function DestinationStep({
                                             paddingHorizontal: 12,
                                             paddingVertical: 8,
                                             borderWidth: 1,
-                                            borderColor: isSelected ? colors.regalNavy : colors.borderLight,
+                                            borderColor: isSelected ? colors.coral : colors.borderLight,
                                             opacity: pressed ? 0.7 : 1,
                                         })}
                                     >
@@ -270,7 +270,7 @@ export function DestinationStep({
                                             style={{
                                                 fontSize: 13,
                                                 fontWeight: "500",
-                                                color: isSelected ? colors.regalNavy : colors.carbonBlack,
+                                                color: isSelected ? colors.coral : colors.carbonBlack,
                                             }}
                                         >
                                             {item.emoji} {item.name}
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 13,
         fontWeight: "800",
-        color: colors.regalNavy,
+        color: colors.coral,
         letterSpacing: 1.5,
         textTransform: "uppercase",
         opacity: 0.8,

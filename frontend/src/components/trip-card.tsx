@@ -161,7 +161,7 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                                     style={{
                                         fontSize: 24,
                                         fontWeight: '800',
-                                        color: colors.regalNavy,
+                                        color: colors.coral,
                                         textAlign: 'center',
                                         marginBottom: 4,
                                     }}
@@ -200,7 +200,7 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                                 intensity={Platform.OS === 'ios' ? 40 : 100}
                                 tint={imageUrl ? "dark" : "light"}
                                 style={{
-                                    backgroundColor: imageUrl ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.4)',
+                                    backgroundColor: imageUrl ? colors.darkOverlay : colors.glassOverlay,
                                     paddingHorizontal: 10,
                                     paddingVertical: 6,
                                     borderRadius: 10,
@@ -211,7 +211,7 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                                 <Text style={{
                                     fontSize: 12,
                                     fontWeight: '800',
-                                    color: imageUrl ? colors.white : colors.regalNavy,
+                                    color: imageUrl ? colors.white : colors.coral,
                                     letterSpacing: 0.5,
                                 }}>
                                     {formatDateRange(trip.start_date, trip.days.length)}
@@ -225,7 +225,7 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                                 intensity={Platform.OS === 'ios' ? 40 : 100}
                                 tint="light"
                                 style={{
-                                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                                    backgroundColor: colors.glassOverlay,
                                     paddingHorizontal: 12,
                                     paddingVertical: 6,
                                     borderRadius: 10,
@@ -236,11 +236,11 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                                     gap: 6,
                                 }}
                             >
-                                <Text style={{ fontSize: 13, fontWeight: '800', color: colors.regalNavy }}>
+                                <Text style={{ fontSize: 13, fontWeight: '800', color: colors.coral }}>
                                     {trip.days.length}d
                                 </Text>
                                 <View style={{ width: 1, height: 12, backgroundColor: 'rgba(0,0,0,0.1)' }} />
-                                <Text style={{ fontSize: 13, fontWeight: '700', color: colors.regalNavy }}>
+                                <Text style={{ fontSize: 13, fontWeight: '700', color: colors.coral }}>
                                     {totalActivities} acts
                                 </Text>
                             </BlurView>
@@ -257,7 +257,7 @@ export function TripCard({ trip, index, onLongPress }: TripCardProps) {
                                     backgroundColor: pressed ? 'rgba(255, 59, 48, 1)' : 'rgba(255, 255, 255, 0.95)',
                                     justifyContent: 'center',
                                     alignItems: 'center',
-                                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                                    boxShadow: colors.elevatedShadow,
                                 })}
                             >
                                 <Text style={{ fontSize: 14 }}>{Platform.OS === 'ios' ? '🗑️' : '❌'}</Text>

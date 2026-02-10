@@ -52,7 +52,7 @@ export function FormStep({
                         flexDirection: "row",
                         alignItems: "center",
                         marginBottom: 12,
-                        boxShadow: "0 1px 4px rgba(27, 27, 27, 0.04)",
+                        boxShadow: colors.softShadow,
                         borderCurve: "continuous",
                         opacity: pressed ? 0.8 : 1,
                     })}
@@ -62,7 +62,7 @@ export function FormStep({
                             width: 6,
                             height: 6,
                             borderRadius: 3,
-                            backgroundColor: colors.regalNavy,
+                            backgroundColor: colors.coral,
                             marginRight: 10,
                         }}
                     />
@@ -101,7 +101,7 @@ export function FormStep({
                         style={{
                             fontSize: 12,
                             fontWeight: "700",
-                            color: colors.burntPeach,
+                            color: colors.coral,
                             letterSpacing: 1,
                             textTransform: "uppercase",
                             marginBottom: 14,

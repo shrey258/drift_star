@@ -28,7 +28,7 @@ export function DaySection({ day, dayIndex, onEditActivity }: DaySectionProps) {
             >
                 <View
                     style={{
-                        backgroundColor: colors.regalNavy,
+                        backgroundColor: colors.coral,
                         borderRadius: 8,
                         paddingHorizontal: 10,
                         paddingVertical: 6,

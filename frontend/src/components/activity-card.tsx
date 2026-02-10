@@ -86,9 +86,9 @@ export function ActivityCard({ activity, index, onEdit, onDelete, onAddToCalenda
                     borderCurve: "continuous",
                     overflow: "hidden",
                     borderWidth: 1,
-                    borderColor: pressed ? 'rgba(0, 0, 0, 0.1)' : colors.borderLight,
+                    borderColor: pressed ? colors.borderPressed : colors.borderLight,
                     boxShadow: pressed
-                        ? "0 4px 12px rgba(0, 0, 0, 0.08)"
+                        ? colors.pressedShadow
                         : colors.softShadow,
                     transform: [{ scale: pressed ? 0.985 : 1 }],
                 })}
@@ -104,7 +104,7 @@ export function ActivityCard({ activity, index, onEdit, onDelete, onAddToCalenda
                         />
                         {/* Smooth gradient overlay for better text contrast */}
                         <LinearGradient
-                            colors={['transparent', 'rgba(0,0,0,0.3)']}
+                            colors={['transparent', colors.darkOverlay]}
                             style={{
                                 position: "absolute",
                                 bottom: 0,
@@ -126,15 +126,15 @@ export function ActivityCard({ activity, index, onEdit, onDelete, onAddToCalenda
                                 borderRadius: 8,
                                 overflow: 'hidden',
                                 borderWidth: 1,
-                                borderColor: 'rgba(255,255,255,0.3)',
+                                borderColor: colors.glassBorder,
                             }}
                         >
-                            <View style={{ paddingHorizontal: 10, paddingVertical: 5, backgroundColor: 'rgba(255,255,255,0.4)' }}>
+                            <View style={{ paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.glassOverlay }}>
                                 <Text
                                     style={{
                                         fontSize: 11,
                                         fontWeight: "800",
-                                        color: colors.regalNavy,
+                                        color: colors.coral,
                                         letterSpacing: 0.5,
                                     }}
                                 >
@@ -163,7 +163,7 @@ export function ActivityCard({ activity, index, onEdit, onDelete, onAddToCalenda
                                 style={{
                                     fontSize: 11,
                                     fontWeight: "800",
-                                    color: colors.regalNavy,
+                                    color: colors.coral,
                                     letterSpacing: 0.5,
                                 }}
                             >

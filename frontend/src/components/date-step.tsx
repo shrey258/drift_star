@@ -95,7 +95,7 @@ export function DateStep({
             containerProgress.value,
             [0, 1],
             [
-                isActive ? colors.regalNavy : colors.borderLight,
+                isActive ? colors.coral : colors.borderLight,
                 colors.borderLight, // Completed border (invisible due to width 0)
             ]
         );
@@ -132,14 +132,14 @@ export function DateStep({
             marginRight: interpolate(textProgress.value, [0, 1], [0, 10]),
             height: 6,
             borderRadius: 3,
-            backgroundColor: colors.regalNavy,
+            backgroundColor: colors.coral,
         };
     });
 
     const textAnimatedStyle = useAnimatedStyle(() => {
         return {
             fontSize: interpolate(textProgress.value, [0, 1], [17, 24]),
-            color: interpolateColor(textProgress.value, [0, 1], [colors.regalNavy, colors.carbonBlack]),
+            color: interpolateColor(textProgress.value, [0, 1], [colors.coral, colors.carbonBlack]),
         };
     });
 
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 13,
         fontWeight: "800",
-        color: colors.regalNavy,
+        color: colors.coral,
         letterSpacing: 1.5,
         textTransform: "uppercase",
         opacity: 0.8,
@@ -288,12 +288,12 @@ const styles = StyleSheet.create({
     activeDateText: {
         fontSize: 28,
         fontWeight: '800',
-        color: colors.regalNavy,
+        color: colors.coral,
         letterSpacing: -0.5,
     },
     changeButtonText: {
         fontSize: 13,
         fontWeight: '700',
-        color: colors.regalNavy,
+        color: colors.coral,
     }
 });

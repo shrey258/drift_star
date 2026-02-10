@@ -79,8 +79,8 @@ export default function TripsScreen() {
                     paddingBottom: 16,
                     paddingHorizontal: 24,
                     borderBottomWidth: 1,
-                    borderBottomColor: 'rgba(0,0,0,0.06)',
-                    backgroundColor: Platform.OS === 'ios' ? 'rgba(255,255,255,0.8)' : colors.white,
+                    borderBottomColor: colors.borderSubtle,
+                    backgroundColor: Platform.OS === 'ios' ? colors.glassBackground : colors.white,
                     zIndex: 10,
                 }}
             >
@@ -100,10 +100,10 @@ export default function TripsScreen() {
                             borderWidth: 1,
                             borderColor: colors.borderLight,
                             opacity: pressed ? 0.7 : 1,
-                            boxShadow: pressed ? "none" : "0 2px 4px rgba(0,0,0,0.05)",
+                            boxShadow: pressed ? "none" : colors.buttonShadow,
                         })}
                     >
-                        <Text style={{ fontSize: 13, fontWeight: '700', color: colors.regalNavy }}>← Home</Text>
+                        <Text style={{ fontSize: 13, fontWeight: '700', color: colors.coral }}>← Home</Text>
                     </Pressable>
                     <Text style={{ fontSize: 18, fontWeight: '800', color: colors.carbonBlack, letterSpacing: -0.5 }}>
                         My Trips

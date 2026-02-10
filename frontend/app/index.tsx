@@ -36,7 +36,7 @@ export default function HomeScreen() {
 
   const inputAnimatedStyle = useAnimatedStyle(() => ({
     borderColor: withTiming(
-      state.isFocused ? colors.regalNavy : colors.borderLight,
+      state.isFocused ? colors.coral : colors.borderLight,
       { duration: 200 }
     ),
   }));
@@ -89,7 +89,7 @@ export default function HomeScreen() {
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <View style={{ width: 32, height: 32, backgroundColor: colors.regalNavy, borderRadius: 8, justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{ width: 32, height: 32, backgroundColor: colors.coral, borderRadius: 8, justifyContent: 'center', alignItems: 'center' }}>
                 <Text style={{ color: colors.white, fontSize: 18, fontWeight: '800' }}>★</Text>
               </View>
               <Text
@@ -115,11 +115,11 @@ export default function HomeScreen() {
                   borderRadius: 20,
                   borderWidth: 1,
                   borderColor: colors.borderLight,
-                  boxShadow: pressed ? "none" : "0 2px 4px rgba(0,0,0,0.05)",
+                  boxShadow: pressed ? "none" : colors.buttonShadow,
                   transform: [{ scale: pressed ? 0.98 : 1 }],
                 })}
               >
-                <Text style={{ fontSize: 13, fontWeight: '700', color: colors.regalNavy }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: colors.coral }}>
                   My Trips
                 </Text>
               </Pressable>
@@ -213,7 +213,7 @@ export default function HomeScreen() {
             <Animated.View
               entering={FadeIn.duration(200)}
               style={{
-                backgroundColor: "#FEE2E2",
+                backgroundColor: colors.errorLight,
                 borderRadius: 10,
                 padding: 12,
                 marginBottom: 12,
@@ -222,7 +222,7 @@ export default function HomeScreen() {
               <Text
                 style={{
                   fontSize: 14,
-                  color: "#B91C1C",
+                  color: colors.error,
                   textAlign: "center",
                 }}
               >
@@ -240,7 +240,7 @@ export default function HomeScreen() {
               {
                 backgroundColor:
                   state.isCurrentStepValid && !state.isGenerating
-                    ? colors.regalNavy
+                    ? colors.coral
                     : colors.paleOak,
                 borderRadius: 14,
                 borderCurve: "continuous",
@@ -251,7 +251,7 @@ export default function HomeScreen() {
                 gap: 10,
                 boxShadow:
                   state.isCurrentStepValid && !state.isGenerating
-                    ? "0 4px 16px rgba(16, 57, 132, 0.3)"
+                    ? colors.primaryShadow
                     : "none",
               },
               buttonAnimatedStyle,
