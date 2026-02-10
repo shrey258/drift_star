@@ -1,5 +1,7 @@
 import { View, Text, TextInput, Pressable, ScrollView, Platform } from 'react-native';
 import { useState } from 'react';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Activity } from '../services/api-service';
 import { colors } from '../constants/colors';
 import * as Haptics from 'expo-haptics';
@@ -62,6 +64,8 @@ export function EditActivitySheet({ activity, onSave, onCancel }: EditActivitySh
                     paddingVertical: 16,
                     borderBottomWidth: 1,
                     borderBottomColor: colors.borderLight,
+                    backgroundColor: colors.white,
+                    zIndex: 10,
                 }}
             >
                 <Pressable onPress={handleCancel}>
@@ -86,95 +90,64 @@ export function EditActivitySheet({ activity, onSave, onCancel }: EditActivitySh
             {/* Form */}
             <ScrollView
                 style={{ flex: 1 }}
-                contentContainerStyle={{ padding: 20, gap: 24 }}
+                contentContainerStyle={{ paddingBottom: 40 }}
                 keyboardDismissMode="interactive"
             >
-                {/* Activity Name */}
-                <View style={{ gap: 8 }}>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>
-                        ACTIVITY NAME
-                    </Text>
-                    <TextInput
-                        value={name}
-                        onChangeText={setName}
-                        placeholder="Enter activity name"
-                        placeholderTextColor={colors.textSecondary}
-                        style={{
-                            fontSize: 17,
-                            color: colors.text,
-                            backgroundColor: colors.white,
-                            paddingHorizontal: 16,
-                            paddingVertical: 12,
-                            borderRadius: 12,
-                            borderWidth: 1,
-                            borderColor: colors.borderLight,
-                        }}
-                    />
-                </View>
+                {/* Image Preview */}
+                {activity.image_url ? (
+                    <View style={{ height: 240, width: '100%', position: 'relative', overflow: 'hidden' }}>
+                        <Image
+                            source={{ uri: activity.image_url }}
+                            style={{ width: '100%', height: '100%' }}
+                            contentFit="cover"
+                            transition={400}
+                        />
+                        <LinearGradient
+                            colors={['transparent', 'rgba(0,0,0,0.6)']}
+                            style={{
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                height: 100,
+                                justifyContent: 'flex-end',
+                                padding: 20,
+                            }}
+                        />
+                    </View>
+                ) : (
+                    <View style={{
+                        height: 120,
+                        width: '100%',
+                        backgroundColor: colors.primaryLight,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderBottomWidth: 1,
+                        borderBottomColor: colors.borderLight,
+                    }}>
+                        <Text style={{ fontSize: 32 }}>🖼️</Text>
+                        <Text style={{
+                            fontSize: 13,
+                            fontWeight: '600',
+                            color: colors.textSecondary,
+                            marginTop: 8
+                        }}>
+                            No image available
+                        </Text>
+                    </View>
+                )}
 
-                {/* Description */}
-                <View style={{ gap: 8 }}>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>
-                        DESCRIPTION
-                    </Text>
-                    <TextInput
-                        value={description}
-                        onChangeText={setDescription}
-                        placeholder="Enter description"
-                        placeholderTextColor={colors.textSecondary}
-                        multiline
-                        numberOfLines={4}
-                        textAlignVertical="top"
-                        style={{
-                            fontSize: 15,
-                            color: colors.text,
-                            backgroundColor: colors.white,
-                            paddingHorizontal: 16,
-                            paddingVertical: 12,
-                            borderRadius: 12,
-                            borderWidth: 1,
-                            borderColor: colors.borderLight,
-                            minHeight: 100,
-                        }}
-                    />
-                </View>
-
-                {/* Location */}
-                <View style={{ gap: 8 }}>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>
-                        LOCATION
-                    </Text>
-                    <TextInput
-                        value={location}
-                        onChangeText={setLocation}
-                        placeholder="Enter location"
-                        placeholderTextColor={colors.textSecondary}
-                        style={{
-                            fontSize: 17,
-                            color: colors.text,
-                            backgroundColor: colors.white,
-                            paddingHorizontal: 16,
-                            paddingVertical: 12,
-                            borderRadius: 12,
-                            borderWidth: 1,
-                            borderColor: colors.borderLight,
-                        }}
-                    />
-                </View>
-
-                {/* Time & Duration Row */}
-                <View style={{ flexDirection: 'row', gap: 12 }}>
-                    {/* Start Time */}
-                    <View style={{ flex: 1, gap: 8 }}>
+                <View style={{ padding: 20, gap: 24 }}>
+                    {/* Activity Name */}
+                    <View style={{ gap: 8 }}>
                         <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>
-                            START TIME
+                            ACTIVITY NAME
                         </Text>
                         <TextInput
-                            value={startTime}
-                            onChangeText={setStartTime}
-                            placeholder="HH:MM"
+                            value={name}
+                            onChangeText={setName}
+                            placeholder="Enter activity name"
                             placeholderTextColor={colors.textSecondary}
-                            keyboardType="numbers-and-punctuation"
                             style={{
                                 fontSize: 17,
                                 color: colors.text,
@@ -188,17 +161,43 @@ export function EditActivitySheet({ activity, onSave, onCancel }: EditActivitySh
                         />
                     </View>
 
-                    {/* Duration */}
-                    <View style={{ flex: 1, gap: 8 }}>
+                    {/* Description */}
+                    <View style={{ gap: 8 }}>
                         <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>
-                            DURATION (MIN)
+                            DESCRIPTION
                         </Text>
                         <TextInput
-                            value={duration}
-                            onChangeText={setDuration}
-                            placeholder="60"
+                            value={description}
+                            onChangeText={setDescription}
+                            placeholder="Enter description"
                             placeholderTextColor={colors.textSecondary}
-                            keyboardType="number-pad"
+                            multiline
+                            numberOfLines={4}
+                            textAlignVertical="top"
+                            style={{
+                                fontSize: 15,
+                                color: colors.text,
+                                backgroundColor: colors.white,
+                                paddingHorizontal: 16,
+                                paddingVertical: 12,
+                                borderRadius: 12,
+                                borderWidth: 1,
+                                borderColor: colors.borderLight,
+                                minHeight: 120,
+                            }}
+                        />
+                    </View>
+
+                    {/* Location */}
+                    <View style={{ gap: 8 }}>
+                        <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>
+                            LOCATION
+                        </Text>
+                        <TextInput
+                            value={location}
+                            onChangeText={setLocation}
+                            placeholder="Enter location"
+                            placeholderTextColor={colors.textSecondary}
                             style={{
                                 fontSize: 17,
                                 color: colors.text,
@@ -210,6 +209,57 @@ export function EditActivitySheet({ activity, onSave, onCancel }: EditActivitySh
                                 borderColor: colors.borderLight,
                             }}
                         />
+                    </View>
+
+                    {/* Time & Duration Row */}
+                    <View style={{ flexDirection: 'row', gap: 12 }}>
+                        {/* Start Time */}
+                        <View style={{ flex: 1, gap: 8 }}>
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>
+                                START TIME
+                            </Text>
+                            <TextInput
+                                value={startTime}
+                                onChangeText={setStartTime}
+                                placeholder="HH:MM"
+                                placeholderTextColor={colors.textSecondary}
+                                keyboardType="numbers-and-punctuation"
+                                style={{
+                                    fontSize: 17,
+                                    color: colors.text,
+                                    backgroundColor: colors.white,
+                                    paddingHorizontal: 16,
+                                    paddingVertical: 12,
+                                    borderRadius: 12,
+                                    borderWidth: 1,
+                                    borderColor: colors.borderLight,
+                                }}
+                            />
+                        </View>
+
+                        {/* Duration */}
+                        <View style={{ flex: 1, gap: 8 }}>
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>
+                                DURATION (MIN)
+                            </Text>
+                            <TextInput
+                                value={duration}
+                                onChangeText={setDuration}
+                                placeholder="60"
+                                placeholderTextColor={colors.textSecondary}
+                                keyboardType="number-pad"
+                                style={{
+                                    fontSize: 17,
+                                    color: colors.text,
+                                    backgroundColor: colors.white,
+                                    paddingHorizontal: 16,
+                                    paddingVertical: 12,
+                                    borderRadius: 12,
+                                    borderWidth: 1,
+                                    borderColor: colors.borderLight,
+                                }}
+                            />
+                        </View>
                     </View>
                 </View>
             </ScrollView>
