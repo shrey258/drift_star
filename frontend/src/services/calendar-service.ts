@@ -28,14 +28,18 @@ export class CalendarService {
         try {
             const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
 
-            // Find default calendar
-            const defaultCalendar = calendars.find(cal => cal.isPrimary) || calendars[0];
+            // Filter for calendars that allow modifications
+            const editableCalendars = calendars.filter(cal => cal.allowsModifications);
 
-            if (!defaultCalendar) {
-                console.error('[Calendar] No calendars found');
+            if (editableCalendars.length === 0) {
+                console.error('[Calendar] No editable calendars found');
                 return null;
             }
 
+            // Find default calendar among editable ones: prefer primary, then the first available editable one
+            const defaultCalendar = editableCalendars.find(cal => cal.isPrimary) || editableCalendars[0];
+
+            console.log('[Calendar] Using editable calendar:', defaultCalendar.title, `(${defaultCalendar.id})`);
             return defaultCalendar.id;
         } catch (error) {
             console.error('[Calendar] Failed to get calendars:', error);
