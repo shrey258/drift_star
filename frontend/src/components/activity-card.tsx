@@ -1,8 +1,10 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Platform } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Image } from "expo-image";
 import { colors } from "../constants/colors";
+import * as Haptics from "expo-haptics";
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface Activity {
     id: string;
@@ -18,6 +20,8 @@ interface ActivityCardProps {
     activity: Activity;
     index: number;
     onEdit?: () => void;
+    onDelete?: () => void;
+    onAddToCalendar?: () => void;
 }
 
 function formatTime(time: string): string {
@@ -35,146 +39,165 @@ function formatDuration(minutes: number): string {
     return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
 }
 
-export function ActivityCard({ activity, index, onEdit }: ActivityCardProps) {
+export function ActivityCard({ activity, index, onEdit, onDelete, onAddToCalendar }: ActivityCardProps) {
     return (
-        <Animated.View
-            entering={FadeIn.duration(400).delay(index * 80)}
-            style={{
-                flexDirection: "row",
-                marginBottom: 16,
-            }}
-        >
-            {/* Timeline Connector */}
-            <View style={{ width: 56, alignItems: "center" }}>
-                <Text
-                    style={{
-                        fontSize: 12,
-                        fontWeight: "600",
-                        color: colors.ashBrown,
-                        marginBottom: 8,
-                    }}
-                >
-                    {formatTime(activity.start_time)}
-                </Text>
-                <View
-                    style={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: 5,
-                        backgroundColor: colors.regalNavy,
-                        marginBottom: 4,
-                    }}
-                />
-                <View
-                    style={{
-                        flex: 1,
-                        width: 2,
-                        backgroundColor: colors.borderLight,
-                        minHeight: 80,
-                    }}
-                />
-            </View>
-
-            {/* Card */}
+        <Animated.View entering={FadeIn.duration(300).delay(index * 60)}>
             <Pressable
-                onPress={onEdit}
+                onPress={() => {
+                    if (Platform.OS === 'ios') {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }
+                    onEdit?.();
+                }}
+                onLongPress={() => {
+                    if (Platform.OS === 'ios') {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    }
+
+                    // Show action sheet on long press
+                    if (Platform.OS === 'ios') {
+                        // iOS: Use ActionSheetIOS
+                        const ActionSheetIOS = require('react-native').ActionSheetIOS;
+                        ActionSheetIOS.showActionSheetWithOptions(
+                            {
+                                options: ['Cancel', 'Edit', 'Add to Calendar', 'Delete'],
+                                destructiveButtonIndex: 3,
+                                cancelButtonIndex: 0,
+                            },
+                            (buttonIndex: number) => {
+                                if (buttonIndex === 1) {
+                                    onEdit?.();
+                                } else if (buttonIndex === 2) {
+                                    onAddToCalendar?.();
+                                } else if (buttonIndex === 3) {
+                                    onDelete?.();
+                                }
+                            }
+                        );
+                    } else {
+                        // Android: Just trigger edit for now (can add Android menu later)
+                        onEdit?.();
+                    }
+                }}
                 style={({ pressed }) => ({
-                    flex: 1,
                     backgroundColor: colors.white,
                     borderRadius: 16,
                     borderCurve: "continuous",
                     overflow: "hidden",
                     borderWidth: 1,
-                    borderColor: colors.borderLight,
-                    boxShadow: "0 2px 12px rgba(27, 27, 27, 0.06)",
-                    opacity: pressed ? 0.95 : 1,
-                    transform: [{ scale: pressed ? 0.98 : 1 }],
+                    borderColor: pressed ? 'rgba(0, 0, 0, 0.12)' : colors.borderLight,
+                    boxShadow: pressed
+                        ? "0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04)"
+                        : "0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)",
+                    transform: [{ scale: pressed ? 0.97 : 1 }],
                 })}
             >
                 {/* Image */}
                 {activity.image_url && (
-                    <Image
-                        source={{ uri: activity.image_url }}
-                        style={{ width: "100%", height: 140 }}
-                        contentFit="cover"
-                        transition={300}
-                    />
+                    <View style={{ position: "relative", overflow: 'hidden' }}>
+                        <Image
+                            source={{ uri: activity.image_url }}
+                            style={{ width: "100%", height: 180 }}
+                            contentFit="cover"
+                            transition={300}
+                        />
+                        {/* Smooth gradient overlay for better text contrast */}
+                        <LinearGradient
+                            colors={['transparent', 'rgba(0,0,0,0.2)']}
+                            style={{
+                                position: "absolute",
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                height: 60,
+                            }}
+                            pointerEvents="none"
+                        />
+                    </View>
                 )}
 
                 {/* Content */}
-                <View style={{ padding: 16 }}>
+                <View style={{ padding: 18 }}>
+                    {/* Time & Duration Row */}
                     <View
                         style={{
                             flexDirection: "row",
                             alignItems: "center",
-                            marginBottom: 8,
+                            marginBottom: 12,
+                            gap: 10,
                         }}
                     >
                         <View
                             style={{
                                 backgroundColor: colors.primaryLight,
-                                borderRadius: 6,
-                                paddingHorizontal: 8,
-                                paddingVertical: 4,
+                                borderRadius: 7,
+                                borderCurve: "continuous",
+                                paddingHorizontal: 10,
+                                paddingVertical: 5,
+                                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.08)",
                             }}
                         >
                             <Text
                                 style={{
                                     fontSize: 11,
-                                    fontWeight: "600",
+                                    fontWeight: "800",
                                     color: colors.regalNavy,
+                                    letterSpacing: 0.3,
+                                }}
+                            >
+                                {formatTime(activity.start_time)}
+                            </Text>
+                        </View>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                            <Text style={{ fontSize: 12, color: colors.ashBrown }}>⏱</Text>
+                            <Text
+                                style={{
+                                    fontSize: 12,
+                                    fontWeight: "600",
+                                    color: colors.ashBrown,
                                 }}
                             >
                                 {formatDuration(activity.duration_minutes)}
                             </Text>
                         </View>
-                        {onEdit && (
-                            <Text
-                                style={{
-                                    marginLeft: "auto",
-                                    fontSize: 11,
-                                    fontWeight: "700",
-                                    color: colors.ashBrown,
-                                    textTransform: "uppercase",
-                                }}
-                            >
-                                Edit
-                            </Text>
-                        )}
                     </View>
 
+                    {/* Name */}
                     <Text
                         style={{
-                            fontSize: 17,
+                            fontSize: 18,
                             fontWeight: "700",
                             color: colors.carbonBlack,
-                            marginBottom: 6,
+                            marginBottom: 8,
+                            letterSpacing: -0.3,
                         }}
                         numberOfLines={2}
                     >
                         {activity.name}
                     </Text>
 
+                    {/* Description */}
                     <Text
                         style={{
                             fontSize: 14,
                             color: colors.ashBrown,
-                            lineHeight: 20,
-                            marginBottom: 10,
+                            lineHeight: 21,
+                            marginBottom: 12,
+                            fontWeight: "400",
                         }}
                         numberOfLines={2}
                     >
                         {activity.description}
                     </Text>
 
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    {/* Location */}
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                         <Text style={{ fontSize: 14 }}>📍</Text>
                         <Text
                             style={{
                                 fontSize: 13,
-                                fontWeight: "500",
+                                fontWeight: "600",
                                 color: colors.carbonBlack,
-                                marginLeft: 4,
                             }}
                             numberOfLines={1}
                         >

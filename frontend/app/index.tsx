@@ -18,6 +18,7 @@ import Animated, {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { colors } from "../src/constants/colors";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { useHomeViewModel } from "../src/view-models/use-home-view-model";
 import { SUGGESTIONS } from "../src/constants/suggestions";
 import { FormStep } from "../src/components/form-step";
@@ -30,6 +31,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { state, refs, animations, actions } = useHomeViewModel();
 
   const inputAnimatedStyle = useAnimatedStyle(() => ({
@@ -69,18 +71,31 @@ export default function HomeScreen() {
           entering={FadeInDown.duration(400).delay(50)}
           style={{ marginBottom: 28 }}
         >
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: "700",
-              color: colors.burntPeach,
-              letterSpacing: 1.5,
-              textTransform: "uppercase",
-              marginBottom: 8,
-            }}
-          >
-            Drift Star
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <Text
+              style={{
+                fontSize: 12,
+                fontWeight: "700",
+                color: colors.burntPeach,
+                letterSpacing: 1.5,
+                textTransform: "uppercase",
+              }}
+            >
+              Drift Star
+            </Text>
+            {state.savedTrips.length > 0 && (
+              <Pressable
+                onPress={() => router.push('/trips')}
+                style={({ pressed }) => ({
+                  opacity: pressed ? 0.6 : 1,
+                })}
+              >
+                <Text style={{ fontSize: 15, fontWeight: '600', color: colors.primary }}>
+                  My Trips →
+                </Text>
+              </Pressable>
+            )}
+          </View>
           <Text
             style={{
               fontSize: 32,
