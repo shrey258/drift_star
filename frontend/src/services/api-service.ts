@@ -2,6 +2,8 @@
  * API service for Drift Star backend.
  */
 
+import { MOCK_TOKYO_ITINERARY } from "../constants/mock-trip";
+
 const API_BASE_URL = "https://drift-star-backend.fly.dev";
 
 export interface GenerateItineraryRequest {
@@ -36,8 +38,6 @@ export interface Itinerary {
     days: Day[];
     hero_image_url?: string;
 }
-
-import { MOCK_TOKYO_ITINERARY } from "../constants/mock-trip";
 
 export class ApiService {
     private baseUrl: string;

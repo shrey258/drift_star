@@ -1,10 +1,9 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable , Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { colors } from '../constants/colors';
 import { Itinerary } from '../services/api-service';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from "expo-blur";

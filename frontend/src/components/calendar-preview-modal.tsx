@@ -1,8 +1,7 @@
-import { View, Text, Pressable, ScrollView, Modal } from 'react-native';
+import { View, Text, Pressable, ScrollView, Modal , Platform } from 'react-native';
 import { colors } from '../constants/colors';
 import { Itinerary, Activity } from '../services/api-service';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
 
 interface CalendarPreviewModalProps {
     visible: boolean;
