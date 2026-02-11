@@ -52,3 +52,22 @@ DriftStar follows a **Warm-Premium** aesthetic:
 - **StorageService**: Manages the local persistence and synchronization of trip data.
 - **CalendarService**: Handles the complex permission flows and event creation for iOS/Android calendars.
 - **ApiService**: Encapsulates all network logic with robust typing and error handling.
+
+## 🧪 Testing
+
+### Frontend (Jest + jest-expo)
+```bash
+cd frontend && npm test
+```
+**35 unit tests** across 3 service suites:
+| Suite | Tests | Coverage |
+|---|---|---|
+| `StorageService` | 15 | CRUD, listing, sorting, calendar mappings, error handling |
+| `ApiService` | 12 | Real API, Tokyo simulation, date formatting, errors |
+| `CountryService` | 7 | Input validation, result limiting, error recovery |
+
+### Backend (Pytest)
+```bash
+cd backend && pytest test_api.py -v
+```
+Tests cover all API endpoints, Pydantic model validation, and mocked external services.
