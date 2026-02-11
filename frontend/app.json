@@ -4,7 +4,7 @@
     "slug": "driftstar",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/splash-logo-light.png",
     "scheme": "driftstar",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -22,7 +22,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#C2553E",
-        "foregroundImage": "./assets/logo.png"
+        "foregroundImage": "./assets/splash-logo-light.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -34,18 +34,19 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/logo.png"
+      "favicon": "./assets/splash-logo-light.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/logo.png",
-          "imageWidth": 200,
+          "image": "./assets/splash-logo-light.png",
+          "imageWidth": 250,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
           "dark": {
+            "image": "./assets/splash-logo-dark.png",
             "backgroundColor": "#1B1B1B"
           }
         }
